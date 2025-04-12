@@ -1,5 +1,11 @@
 {
     "cSpell.words": [
         "Redmine"
-    ]
+    ],
+    "markdown.extension.toc.levels": "2..4",
+    "markdownlint.config": {
+        "MD024": {
+            "siblings_only": true
+        }
+    }
 }
