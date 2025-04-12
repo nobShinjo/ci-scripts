@@ -1,0 +1,43 @@
+stages:
+  - split
+
+variables:
+  PACKAGE_DIR: "Assets/UserPackage"
+  # The URL of the target repository where the UPM package will be pushed.
+  # Expected format: HTTPS URL (e.g., https://gitlab.local/group/project.git)
+  TARGET_REPO_URL: "https://gitlab.local/linesimulation/unity-npm/mypackage.git"
+  # Personal Access Token or Project Access Token with write_repository scope
+  CI_PUSH_TOKEN: "<defined in project settings>"
+
+split_upm_package:
+  stage: split
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache git
+  script:
+    - echo "📦 Split UPM package..."
+    -
+    - echo "🔧 Configuring Git..."
+    - git config --global user.name "GitLab CI"
+    - git config --global user.email "ci@example.com"
+
+    - echo "✂️ Split UPM package from main branch..."
+    - git subtree split --prefix=$PACKAGE_DIR -b extracted-branch
+
+    - echo "🔗 Adding remote repository..."
+    - |
+      echo "🔍 Checking access to remote repository..."
+      if git ls-remote https://oauth2:${CI_PUSH_TOKEN}@${TARGET_REPO_URL#https://} &>/dev/null; then
+        echo "✅ Remote repository is accessible. Proceeding to push."
+      else
+        echo "❌ Cannot access remote repository or it does not exist."
+        exit 1
+      fi
+
+      - echo "🚀 Pushing subtree to main branch..."
+      - git push -f https://oauth2:${CI_PUSH_TOKEN}@${TARGET_REPO_URL#https://} extracted-branch:main
+
+      - echo "✅ UPM package split and pushed successfully."
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: on_success
