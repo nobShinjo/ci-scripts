@@ -80,13 +80,19 @@ if [[ -z "$PUBLISHED_VERSION" ]]; then
     # If the package is not published, use the local version.
     echo "🆕 Not published. Using local version."
     echo "$CURRENT_VERSION" >"$NEXT_VERSION_FILE"
-    update_package_json "$PACKAGE_JSON" "$CURRENT_VERSION"
+    update_package_json "$PACKAGE_JSON" "$CURRENT_VERSION" || {
+        echo "❌ Failed to update package.json"
+        exit 1
+    }
     echo "📝 Adopted version: $CURRENT_VERSION (initial publish)"
 elif [[ "$PUBLISHED_VERSION" == "$CURRENT_VERSION" ]]; then
     # If the package is already published with the same version, bump the version.
     echo "🔁 Already published. Bumping $BUMP_TYPE..."
     NEXT_VERSION=$(npm --no-git-tag-version version "$BUMP_TYPE" --prefix "$DIST_DIR" | sed 's/v//')
-    update_package_json "$PACKAGE_JSON" "$NEXT_VERSION"
+    update_package_json "$PACKAGE_JSON" "$NEXT_VERSION" || {
+        echo "❌ Failed to update package.json"
+        exit 1
+    }
     echo "$NEXT_VERSION" >"$NEXT_VERSION_FILE"
     echo "📝 Adopted version: $NEXT_VERSION (bumped from $CURRENT_VERSION)"
 elif [[ "$(printf '%s\n' "$PUBLISHED_VERSION" "$CURRENT_VERSION" | sort -V | head -n1)" == "$CURRENT_VERSION" ]]; then
@@ -97,7 +103,10 @@ elif [[ "$(printf '%s\n' "$PUBLISHED_VERSION" "$CURRENT_VERSION" | sort -V | hea
 else
     # If the local version is newer than the published version, update the package.json.
     echo "✅ Local version ($CURRENT_VERSION) is newer than published version ($PUBLISHED_VERSION)."
-    update_package_json "$PACKAGE_JSON" "$CURRENT_VERSION"
+    update_package_json "$PACKAGE_JSON" "$CURRENT_VERSION" || {
+        echo "❌ Failed to update package.json"
+        exit 1
+    }
     echo "$CURRENT_VERSION" >"$NEXT_VERSION_FILE"
     echo "📝 Adopted version: $CURRENT_VERSION (ahead of registry)"
 fi
