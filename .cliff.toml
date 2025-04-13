@@ -1,3 +1,87 @@
+# .cliff.toml - Git Cliff config for Unity UPM package
+
+[changelog]
+# Header for the changelog (markdown)
+header = """
+# 📦 Changelog
+
+All notable changes to this package will be documented in this file.
+"""
+
+# Footer (optional)
+footer = """
+---
+_This changelog was automatically generated using [git-cliff](https://github.com/orhun/git-cliff)._
+"""
+
+# Tag pattern: v1.2.3
+tag_pattern = "^v[0-9]+\\.[0-9]+\\.[0-9]+$"
+
+# Sorting
+sort_commits = "desc"
+
+# Group commits into sections
+[[changelog.groups]]
+title = "🚀 Features"
+regex = "^(feat|feature)(\\(.+\\))?:"
+
+[[changelog.groups]]
+title = "🐛 Bug Fixes"
+regex = "^(fix)(\\(.+\\))?:"
+
+[[changelog.groups]]
+title = "🛠 Improvements"
+regex = "^(refactor|perf|style|improve)(\\(.+\\))?:"
+
+[[changelog.groups]]
+title = "🧪 Tests"
+regex = "^test(\\(.+\\))?:"
+
+[[changelog.groups]]
+title = "📚 Documentation"
+regex = "^docs(\\(.+\\))?:"
+
+[[changelog.groups]]
+title = "🔧 Maintenance"
+regex = "^(chore|build|ci|meta)(\\(.+\\))?:"
+
+[[changelog.groups]]
+title = "🔁 Others"
+regex = ".*"
+
+# Optional: filter commits that should be skipped
+[git]
+# Exclude merge commits if not needed
+exclude_merge_commits = true
+
+# Template for each commit
+commit_preprocessors = [
+    { pattern = "\\(#([0-9]+)\\)", replace = "([#${1}](https://gitlab.local/${REPO}/-/merge_requests/${1}))" },
+]
+
+# Commit formatting
+commit_parsers = [
+    { message = "^feat", group = "🚀 Features" },
+    { message = "^fix", group = "🐛 Bug Fixes" },
+    { message = "^refactor", group = "🛠 Improvements" },
+    { message = "^perf", group = "🛠 Improvements" },
+    { message = "^style", group = "🛠 Improvements" },
+    { message = "^test", group = "🧪 Tests" },
+    { message = "^docs", group = "📚 Documentation" },
+    { message = "^chore", group = "🔧 Maintenance" },
+    { message = "^ci", group = "🔧 Maintenance" },
+    { message = ".*", group = "🔁 Others" },
+]
+
+# Commit display format
+[template]
+# Example: - feat(UI): added new button
+commit = "- {{message}}"
+
+# Example: ## [1.2.3] - 2024-04-13
+tag = "## [{{version}}] - {{timestamp | date(format=\"%Y-%m-%d\")}}"
+
+
 [changelog]
 header = "# Changelog"
 body = """
