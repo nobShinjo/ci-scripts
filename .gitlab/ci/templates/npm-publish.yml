@@ -25,15 +25,21 @@ variables:
   PACKAGE_JSON_PATH: "${PACKAGE_NAME}/package.json"
   PUBLISH_SOURCE_DIR: "Assets/${PACKAGE_NAME}"
   DIST_DIR: "dist"
-  GITLAB_URI: "https://gitlab.local/"
-  PROJECT_ID: "1234"
-  NPM_REGISTRY_URL: "${GITLAB_URI}api/v4/projects/${PROJECT_ID}/packages/npm/"
+  NPM_REGISTRY_URL: "https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/"
   GIT_AUTHOR_NAME: "gitlab-ci"
   GIT_AUTHOR_EMAIL: "ci@example.com"
 
 .default_before_script:
+  image: "node:18-alpine"
   before_script:
+    # Install necessary tools
     - apk add --no-cache jq curl git
+    - echo "📦 Tool Versions:"
+    - jq --version
+    - curl --version | head -n1
+    - git --version
+    - npm -v
+
     # set -euo pipefail: Exit immediately if a command exits with a non-zero status.
     - set -euo pipefail
     - git config --global user.name "$GIT_AUTHOR_NAME"
@@ -65,8 +71,7 @@ publish_upm_prepare:
 
     # Copy the necessary files to the dist directory
     - cp "$PACKAGE_JSON_PATH" "$DIST_DIR/package.json"
-    - '[ -f "README.md" ] && cp README.md "$DIST_DIR/" || echo "⚠️ README.md missing"'
-    - '[ -f "CHANGELOG.md" ] && cp CHANGELOG.md "$DIST_DIR/" || echo "⚠️ CHANGELOG.md missing"'
+    - for f in README.md CHANGELOG.md; do [ -f "$f" ] && cp "$f" "$DIST_DIR/" || echo "⚠️ $f missing"; done
     - cp -r "$PUBLISH_SOURCE_DIR"/* "$DIST_DIR/" || echo "⚠️ No source files found in $PUBLISH_SOURCE_DIR"
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
@@ -121,11 +126,23 @@ publish_upm_publish:
     - git tag "v$VERSION"
     - git push origin "v$VERSION"
 
-    # Publish the package to the GitLab npm registry
-    - echo "📦 Publishing to GitLab npm registry..."
+    # Create .npmrc file for authentication with the GitLab npm registry
+    - echo "🔑 Creating .npmrc file..."
+    - echo "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${NPM_TOKEN}" > "$DIST_DIR/.npmrc"
+
+    # Check to authenticate with the GitLab npm registry
     - cd "$DIST_DIR"
-    - echo "//gitlab.local/api/v4/projects/1234/packages/npm/:_authToken=${NPM_TOKEN}" > .npmrc
-    - npm publish --access=public
+    - echo "🔑 Authenticating with GitLab npm registry..."
+    - |
+      npm whoami --registry="$NPM_REGISTRY_URL" --userconfig ".npmrc" || {
+        echo "❌ Authentication failed";
+        exit 1;
+      }
+    - echo "📦 Publishing to GitLab npm registry..."
+    - npm publish --access=public --registry="$NPM_REGISTRY_URL" --userconfig ".npmrc"
+    - echo "🧹 Cleaning up..."
+    - rm -f .npmrc
     - cd ..
+    - echo "✅ Published successfully!"
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
