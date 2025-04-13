@@ -1,0 +1,26 @@
+stages:
+  - changelog
+
+.generate_changelog_common:
+  before_script:
+    - apk add --no-cache git git-cliff
+    - set -euo pipefail
+
+generate_changelog_draft:
+  stage: changelog
+  extends: .generate_changelog_common
+  script:
+    - echo "📝 Generating draft CHANGELOG from commits (Unreleased only)..."
+    - git cliff --unreleased --config .cliff.toml > .changelog_unreleased.md
+
+    - echo "✅ Draft generated at: .changelog_unreleased.md"
+    - echo "📌 Please manually review and insert into CHANGELOG.md if needed."
+
+  artifacts:
+    name: "changelog-draft"
+    paths:
+      - .changelog_unreleased.md
+    expire_in: 1 week
+
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'

@@ -1,0 +1,14 @@
+merge_changelog_unreleased:
+  stage: changelog
+  extends: .default_before_script
+  script:
+    - bash .gitlab/ci/scripts/merge_unreleased_into_changelog.sh
+    - bash .gitlab/ci/scripts/append_changelog_links.sh
+    - git add CHANGELOG.md
+    - git commit -m "docs: merge changelog & append comparison links"
+    - git push origin "$CI_COMMIT_BRANCH"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - exists:
+        - .changelog_unreleased.md
+        - CHANGELOG.md
