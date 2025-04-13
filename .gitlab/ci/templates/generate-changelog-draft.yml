@@ -1,0 +1,54 @@
+stages:
+  - changelog-draft
+
+.generate_changelog_common:
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache git git-cliff
+    - echo "📦 Tool Versions:"
+    - git --version
+    - git-cliff --version
+
+    - set -euo pipefail
+
+generate_changelog_draft:
+  stage: changelog-draft
+  extends: .generate_changelog_common
+  script:
+    - echo "📝 Generating changelog draft..."
+
+    # Ensure .cliff.toml exists (fail fast)
+    - |
+      if [ ! -f .cliff.toml ]; then
+        echo "❌ .cliff.toml not found. Aborting."
+        exit 1
+      fi
+
+    # Fetch main branch for comparison
+    - echo "📥 Fetching origin/main..."
+    - git fetch origin main
+
+    # Generate changelog draft
+    - git-cliff --unreleased --config .cliff.toml > .changelog_draft.md
+    - echo "✅ Draft generated at .changelog_draft.md"
+    - echo "📌 Please review the draft changelog."
+  artifacts:
+    name: "changelog-draft"
+    paths:
+      - .changelog_draft.md
+    expire_in: 1 week
+
+  rules:
+    # Execute only if:
+    # 1. It's a merge request
+    # 2. The source branch is feature/*
+    # 3. .cliff.toml exists
+    - if: "$CI_MERGE_REQUEST_IID"
+      when: on_success
+    - if: '$CI_COMMIT_BRANCH =~ /^feature\//'
+      when: on_success
+    - exists:
+        - ".cliff.toml"
+      when: on_success
+    # Skip this job unless all conditions above are satisfied
+    - when: never
