@@ -1,5 +1,7 @@
 {
     "cSpell.words": [
-        "elif"
+        "elif",
+        "pipefail",
+        "userconfig"
     ]
 }
