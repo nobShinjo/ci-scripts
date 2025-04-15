@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <OutputPath>bin/</OutputPath>
+
+        <!-- Unity Version-->
+        <UnityEditorVersion>6.0.0f1</UnityEditorVersion>
+
+        <!-- Unity DLL Path (Windows) -->
+        <UnityBasePath>C:\Program
+            Files\Unity\Hub\Editor\$(UnityEditorVersion)\Editor\Data\Managed\UnityEngine</UnityBasePath>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- Unity Project Files -->
+        <Compile Include=".\Assets\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- Unity DLL References -->
+        <Reference Include="UnityEngine.CoreModule">
+            <HintPath>$(UnityBasePath)\UnityEngine.CoreModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine">
+            <HintPath>$(UnityBasePath)\UnityEngine.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.PhysicsModule">
+            <HintPath>$(UnityBasePath)\UnityEngine.PhysicsModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.InputLegacyModule">
+            <HintPath>$(UnityBasePath)\UnityEngine.InputLegacyModule.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
+</Project>
