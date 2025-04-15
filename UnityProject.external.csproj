@@ -18,6 +18,12 @@
     <ItemGroup>
         <!-- Unity Project Files -->
         <Compile Include=".\Assets\**\*.cs" />
+        <!-- Package Files -->
+        <Compile Include=".\Packages\**\*.cs" Condition="Exists('.\Packages')" />
+        <!-- Plugins DLLs -->
+        <Reference Include="**">
+            <HintPath>.\Assets\Plugins\**\*.dll</HintPath>
+        </Reference>
     </ItemGroup>
 
     <ItemGroup>
