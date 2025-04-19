@@ -1,3 +1,20 @@
+# Title: generate-changelog.yml
+#
+# Description:
+# This script is designed to generate and manage changelogs using git-cliff.
+# It is used in a GitLab CI/CD pipeline.
+# It consists of four main stages:
+#     1. draft: Generate a draft changelog.
+#     2. merge: Merge the draft into CHANGELOG.md.
+#     3. release: Generate the final changelog.
+#     4. update_tag: Update the changelog for a new tag.
+#
+# Features:
+#     - Generates a draft changelog based on commit messages using git-cliff.
+#     - Merges the draft into CHANGELOG.md.
+#     - Generates a final changelog for the release using git-cliff.
+#     - Updates the changelog for a new tag.
+
 stages:
   - draft
   - merge
