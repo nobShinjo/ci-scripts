@@ -1,11 +1,22 @@
 #!/bin/bash
 set -euo pipefail
 
+# Title: merge_draft_into_changelog.sh
+#
+# Description:
+#   This script merges the draft changelog file into the main CHANGELOG.md file.
+#   It ensures that the Unreleased section is updated with the latest changes from the draft.
+
+# =========================
 # Configurations
+# =========================
 DRAFT_FILE=".changelog_draft.md"
 CHANGELOG_FILE="CHANGELOG.md"
 TMP_FILE=".changelog_merged.tmp.md"
 
+# =========================
+# Main script
+# =========================
 if [ ! -f "$DRAFT_FILE" ]; then
     echo "❌ $DRAFT_FILE is not found."
     exit 1
