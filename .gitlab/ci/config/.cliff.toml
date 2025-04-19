@@ -47,14 +47,16 @@ footer = """
 {% for release in releases %}
   {% if release.version -%}
     {% if release.previous and release.previous.version %}
-      Full Changelog: <{{ self::remote_url() }}/-/compare/{{ release.previous.version }}...{{ release.version }}> \n
-      [{{ release.version | trim_start_matches(pat="v") }}]: {{ self::remote_url() }}/-/releases/{{ release.version }} \n\n
+      {# Normal section. Compare the previous version with the current one. -#}
+      Full Changelog: [{{ release.previous.version }}...{{ release.version }}]({{ self::remote_url() }}/-/compare/{{ release.previous.version }}...{{ release.version }})
     {% endif -%}
   {% else -%}
     {% if release.previous and release.previous.version %}
-      [unreleased]: {{ self::remote_url() }}/-/compare/{{ release.previous.version }}...HEAD
+      {# Unreleased Section. Compare the previous version with the current one. -#}
+      Full Changelog: [{{ release.previous.version }}...HEAD]({{ self::remote_url() }}/-/compare/{{ release.previous.version }}...HEAD)
     {% else -%}
-      [unreleased]: {{ self::remote_url() }}/-/releases/unreleased
+      {# 1st. release. -#}
+      Full Changelog: [{{ release.commit_id | truncate(length=7, end="") }}]({{ self::remote_url() }}/-/commits/{{ release.commit_id }})
     {% endif -%}
   {% endif -%}
 {% endfor %}
@@ -119,7 +121,7 @@ commit_parsers = [
   { message = "^Merge (branch|remote-tracking branch|pull request)", skip = true },
   { message = "^Merge ![0-9]+", skip = true },
   { message = "^bump:", skip = true },
-  { message = "^(\\[)?skip( ci)?(\\])?", skip = true },
+  { message = "^\\[?skip[- ]?ci\\]?$/i", skip = true },
 
   # Keep a Changelog groups
   ## Breaking changes
