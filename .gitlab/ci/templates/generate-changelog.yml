@@ -61,7 +61,7 @@ generate_changelog_release:
   before_script:
     - apk add --no-cache git git-cliff
   script:
-    - echo "📝 Generating final changelog..."
+    - echo "📝 Generating final changelog...
     - |
       if [ ! -f "$CLIFF_CONFIG_PATH" ]; then
         echo "❌ $CLIFF_CONFIG_PATH not found. Aborting."
@@ -69,8 +69,8 @@ generate_changelog_release:
       fi
     - git fetch origin main
     - git-cliff --config $CLIFF_CONFIG_PATH  > CHANGELOG.md
-    - echo "✅ Final changelog:"
-    - cat CHANGELOG.md
+    - echo "✅ Final changelog generated at CHANGELOG.md"
+    - echo "📌 Please review the final changelog."
   artifacts:
     name: "changelog-release"
     paths:
@@ -79,3 +79,19 @@ generate_changelog_release:
   rules:
     # - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/'
     when: manual
+
+merge_changelog_unreleased:
+  stage: changelog
+  extends: .default_before_script
+  script:
+    - echo "📝 Merging changelog draft into CHANGELOG.md..."
+    - bash .gitlab/ci/scripts/merge_draft_into_changelog.sh
+    - git add CHANGELOG.md
+    - git commit -m "docs: update changelog"
+    - git push origin "$CI_COMMIT_BRANCH"
+    - echo "✅ Changelog merged into CHANGELOG.md"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - exists:
+        - .changelog_draft.md
+        - CHANGELOG.md
