@@ -168,8 +168,8 @@ sort_commits = "newest"
 # See: https://git-cliff.org/docs/configuration/git#link_parsers
 link_parsers = [
   # GitLab issues and merge requests
-  { pattern = "#([0-9]+)", url = "{{ remote_url }}/-/issues/{{ id }}" },
-  { pattern = "!([0-9]+)", url = "{{ remote_url }}/-/merge_requests/{{ id }}" },
+  { pattern = "#([0-9]+)", href = "{{ remote_url }}/-/issues/{{ id }}" },
+  { pattern = "!([0-9]+)", href = "{{ remote_url }}/-/merge_requests/{{ id }}" },
   # Git commit hashes
-  { pattern = "([0-9a-f]{7,40})", url = "{{ remote_url }}/-/commit/{{ id }}" },
+  { pattern = "([0-9a-f]{7,40})", href = "{{ remote_url }}/-/commit/{{ id }}" },
 ]
