@@ -2,6 +2,12 @@ stages:
   - draft
   - merge
   - release
+  - update_tag
+
+variables:
+  GIT_AUTHOR_NAME: "gitlab-ci"
+  GIT_AUTHOR_EMAIL: "ci@example.com"
+  CLIFF_CONFIG_PATH: ".gitlab/ci/config/.cliff.toml"
 
 .generate_changelog_common:
   image: alpine:latest
@@ -11,9 +17,10 @@ stages:
     - git --version
     - git-cliff --version
 
+    # set -euo pipefail: Exit immediately if a command exits with a non-zero status.
     - set -euo pipefail
-    # Configuration variables
-    - CLIFF_CONFIG_PATH=".gitlab/ci/config/.cliff.toml"
+    - git config --global user.name "$GIT_AUTHOR_NAME"
+    - git config --global user.email "$GIT_AUTHOR_EMAIL"
 
 generate_changelog_draft:
   stage: draft
@@ -72,11 +79,13 @@ merge_changelog_unreleased:
     - git push origin "$CI_COMMIT_BRANCH"
     - echo "✅ Changelog merged into CHANGELOG.md"
   rules:
+    # Execute only if:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_PIPELINE_SOURCE'
       exists:
         - .changelog_draft.md
         - CHANGELOG.md
       when: on_success
+    # Skip otherwise
     - when: never
 
 generate_changelog_release:
@@ -106,3 +115,27 @@ generate_changelog_release:
     expire_in: 1 week
   rules:
     - when: manual
+
+update_changelog_for_tag:
+  stage: update_tag
+  extends: .generate_changelog_common
+  script:
+    - echo "🏷️ Updating changelog for new tag..."
+
+    # Update CHANGELOG.md for the new tag
+    - bash .gitlab/ci/scripts/update_changelog_for_tag.sh
+
+    # Commit and push the updated changelog
+    - echo "📦 Committing changes..."
+    - LATEST_TAG=$(git describe --tags --abbrev=0)
+    - git add CHANGELOG.md
+    - git commit -m "docs: update changelog for tag $LATEST_TAG"
+    - git push origin HEAD:$CI_COMMIT_REF_NAME
+
+    - echo "🚀 Changelog updated successfully for tag $LATEST_TAG"
+  rules:
+    # Execute only when a new tag is created
+    - if: $CI_COMMIT_TAG
+      when: on_success
+    # Skip otherwise
+    - when: never
