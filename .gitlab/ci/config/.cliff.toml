@@ -33,7 +33,7 @@ body = """
 
   {% for commit in commits %}
     {%- set msg = commit.message | split(pat="\n") | first | trim -%}
-    - {{ msg | upper_first }} [({{ commit.id | truncate(length=7, end="") }})]({{ self::remote_url() }}/-/commit/{{ commit.id }})
+    - {{ msg | upper_first }} ({{ commit.id | truncate(length=7, end="") }})
   {% endfor -%}
 {% endfor %}
 """
@@ -166,9 +166,10 @@ sort_commits = "newest"
 # An array of link parsers for extracting external references,m and turning them int URLs, using regex.
 # See: https://git-cliff.org/docs/configuration/git#link_parsers
 link_parsers = [
+  # NOTE: The following link parsers are supported by GitLab:
   # GitLab issues and merge requests
-  { pattern = "#([0-9]+)", href = "https://gitlab.local/your-group/your-project/-/issues/{{ id }}" },
-  { pattern = "!([0-9]+)", href = "https://gitlab.local/your-group/your-project/-/merge_requests/{{ id }}" },
+  # { pattern = "#([0-9]+)", href = "https://gitlab.local/your-group/your-project/-/issues/{{ id }}" },
+  # { pattern = "!([0-9]+)", href = "https://gitlab.local/your-group/your-project/-/merge_requests/{{ id }}" },
   # Git commit hashes
-  { pattern = "([0-9a-f]{7,40})", href = "https://gitlab.local/your-group/your-project/-/commit/{{ id }}" },
+  # { pattern = "([0-9a-f]{7,40})", href = "https://gitlab.local/your-group/your-project/-/commit/{{ id }}" },
 ]
