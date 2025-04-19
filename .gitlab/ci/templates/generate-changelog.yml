@@ -9,7 +9,7 @@ variables:
   GIT_AUTHOR_EMAIL: "ci@example.com"
   CLIFF_CONFIG_PATH: ".gitlab/ci/config/.cliff.toml"
 
-.generate_changelog_common:
+.default_before_script:
   image: alpine:latest
   before_script:
     - apk add --no-cache git git-cliff
@@ -24,7 +24,7 @@ variables:
 
 generate_changelog_draft:
   stage: draft
-  extends: .generate_changelog_common
+  extends: .default_before_script
   script:
     - echo "📝 Generating changelog draft..."
 
@@ -61,12 +61,14 @@ generate_changelog_draft:
     - exists:
         - "$CLIFF_CONFIG_PATH"
       when: on_success
+    # Manual trigger for other branches
+    - when: manual
     # Skip this job unless all conditions above are satisfied
     - when: never
 
 merge_changelog_unreleased:
   stage: merge
-  extends: .generate_changelog_common
+  extends: .default_before_script
   script:
     - echo "📝 Merging changelog draft into CHANGELOG.md..."
 
@@ -85,12 +87,14 @@ merge_changelog_unreleased:
         - .changelog_draft.md
         - CHANGELOG.md
       when: on_success
+    # Manual trigger for other branches
+    - when: manual
     # Skip otherwise
     - when: never
 
 generate_changelog_release:
   stage: release
-  extends: .generate_changelog_common
+  extends: .default_before_script
   script:
     - echo "📝 Generating final changelog..."
 
@@ -118,7 +122,7 @@ generate_changelog_release:
 
 update_changelog_for_tag:
   stage: update_tag
-  extends: .generate_changelog_common
+  extends: .default_before_script
   script:
     - echo "🏷️ Updating changelog for new tag..."
 
@@ -137,5 +141,7 @@ update_changelog_for_tag:
     # Execute only when a new tag is created
     - if: $CI_COMMIT_TAG
       when: on_success
+    # Manual trigger for other branches
+    - when: manual
     # Skip otherwise
     - when: never
