@@ -67,7 +67,7 @@ footer = """
 trim = true
 
 # The changelog body will be rendered even if there are no release to process.
-render_always = false
+render_always = true
 
 
 # ================================================================
@@ -117,16 +117,18 @@ commit_preprocessors = []
 #  - test: adding or correcting tests
 commit_parsers = [
   # Ignore rules
-  { message = "^Merge branch", skip = true },
-  { message = "^Merge pull request", skip = true },
+  { message = "^Merge (branch|remote-tracking branch|pull request)", skip = true },
+  { message = "^Merge ![0-9]+", skip = true },
   { message = "^bump:", skip = true },
-  { message = "^\\[skip\\]", skip = true },
-  { message = "^\\[ci skip\\]", skip = true },
-  { message = "^\\[skip ci\\]", skip = true },
+  { message = "^(\\[)?skip( ci)?(\\])?", skip = true },
+
   # Keep a Changelog groups
+  ## Breaking changes
+  { message = "^\\w+(\\([^)]*\\))?!:", group = "Breaking" },
+  { body = "(?i)BREAKING[ -]CHANGE", group = "Breaking" },
+
   { message = "^feat", group = "Added" },
-  { message = "^fix", group = "Fixed" },
-  { message = "^docs", group = "Changed" },
+
   { message = "^style", group = "Changed" },
   { message = "^refactor", group = "Changed" },
   { message = "^perf", group = "Changed" },
@@ -134,10 +136,15 @@ commit_parsers = [
   { message = "^build", group = "Changed" },
   { message = "^ci", group = "Changed" },
   { message = "^chore", group = "Changed" },
-  { message = "^revert", group = "Removed" },
-  { message = "^deprecated", group = "Deprecated" },
+
+  { body = "(?i)deprecat(ed|e)", group = "Deprecated" },
+
+  { message = "^fix", group = "Fixed" },
+  { message = "^docs", group = "Documentation" },
+  { message = "^revert", group = "Reverted" },
   { message = "^security", group = "Security" },
   { body = ".*security", group = "Security" },
+
   # Catch-all rule for any other commit messages.
   { message = ".*", group = "Changed" },
 ]
