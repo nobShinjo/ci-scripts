@@ -75,6 +75,9 @@ publish_upm_prepare:
     - cp -r "$PUBLISH_SOURCE_DIR"/* "$DIST_DIR/" || echo "⚠️ No source files found in $PUBLISH_SOURCE_DIR"
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
+      when: on_success
+    - when: manual
+    - when: never
 
 publish_upm_check_version:
   # This stage checks the version of the package to be published.
@@ -95,6 +98,9 @@ publish_upm_check_version:
       - .next_version
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
+      when: on_success
+    - when: manual
+    - when: never
 
 publish_upm_publish:
   # This stage publishes the package to the GitLab npm package registry.
@@ -146,3 +152,6 @@ publish_upm_publish:
     - echo "✅ Published successfully!"
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
+      when: on_success
+    - when: manual
+    - when: never
