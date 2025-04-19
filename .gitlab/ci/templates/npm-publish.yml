@@ -74,7 +74,7 @@ publish_upm_prepare:
     - for f in README.md CHANGELOG.md; do [ -f "$f" ] && cp "$f" "$DIST_DIR/" || echo "⚠️ $f missing"; done
     - cp -r "$PUBLISH_SOURCE_DIR"/* "$DIST_DIR/" || echo "⚠️ No source files found in $PUBLISH_SOURCE_DIR"
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: on_success
     - when: manual
     - when: never
@@ -97,7 +97,7 @@ publish_upm_check_version:
     paths:
       - .next_version
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: on_success
     - when: manual
     - when: never
@@ -151,7 +151,7 @@ publish_upm_publish:
     - cd ..
     - echo "✅ Published successfully!"
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: on_success
     - when: manual
     - when: never
