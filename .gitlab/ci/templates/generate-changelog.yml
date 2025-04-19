@@ -83,7 +83,7 @@ generate_changelog_draft:
     # Skip this job unless all conditions above are satisfied
     - when: never
 
-merge_changelog_unreleased:
+merge_changelog_draft:
   stage: merge
   extends: .default_before_script
   script:
@@ -102,7 +102,6 @@ merge_changelog_unreleased:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_PIPELINE_SOURCE'
       exists:
         - .changelog_draft.md
-        - CHANGELOG.md
       when: on_success
     # Manual trigger for other branches
     - when: manual

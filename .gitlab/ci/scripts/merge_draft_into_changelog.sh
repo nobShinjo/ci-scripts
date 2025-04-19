@@ -17,13 +17,17 @@ TMP_FILE=".changelog_merged.tmp.md"
 # =========================
 # Main script
 # =========================
+echo "🔄 Merging draft into existing CHANGELOG.md..."
+
 if [ ! -f "$DRAFT_FILE" ]; then
     echo "❌ $DRAFT_FILE is not found."
     exit 1
 fi
-if [ ! -f "$CHANGELOG_FILE" ]; then
-    echo "❌ $CHANGELOG_FILE is not found."
-    exit 1
+
+if [ ! -f "CHANGELOG.md" ] || [ ! -s "CHANGELOG.md" ]; then
+    echo "⚠️ CHANGELOG.md does not exist or is empty. Creating new CHANGELOG.md from draft."
+    cp .changelog_draft.md CHANGELOG.md
+    exit 0
 fi
 
 # Get UNRELEASED section from the draft file.
