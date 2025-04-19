@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 body = """
 {% if version -%}
-  # Trim the "v" prefix from the version to ensure consistency in version formatting.
+  {# Trim the "v" prefix from the version to ensure consistency in version formatting.}
   ## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }}
 {% else -%}
   ## [Unreleased]
@@ -143,7 +143,7 @@ commit_parsers = [
   { message = "^docs", group = "Documentation" },
   { message = "^revert", group = "Reverted" },
   { message = "^security", group = "Security" },
-  { body = ".*security", group = "Security" },
+  { body = "(?i)\bsecurity\b", group = "Security" },
 
   # Catch-all rule for any other commit messages.
   { message = ".*", group = "Changed" },
