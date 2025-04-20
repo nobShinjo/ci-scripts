@@ -31,13 +31,19 @@ if [ ! -f "CHANGELOG.md" ] || [ ! -s "CHANGELOG.md" ]; then
 fi
 
 # Get UNRELEASED section from the draft file.
-DRAFT=$(awk '/^## [Unreleased]/{ print; exit }' "$DRAFT_FILE")
+DRAFT=$(awk '/^## \[Unreleased\]/, /^---$/' "$DRAFT_FILE")
+DRAFT=$(sed "s/^## \[Unreleased\]/## \[Draft\]/" <<<"$DRAFT")
+# Get the one line "[Unreleased]: "
+DRAFT_LINK=$(awk '/^\[Unreleased\]:/{ print; exit }' "$DRAFT_FILE")
+DRAFT_LINK=$(sed "s/\[Unreleased\]:/\[Draft\]:/" <<<"$DRAFT_LINK")
 
-# Split CHANGELOG.md into HEADER, and TAIL sections.
+# Split CHANGELOG.md into HEADER, and BODY sections.
 # HEADER is everything before the first version section.
-# TAIL is everything after the first version section.
+# BODY is everything after the first version section.
 HEADER=$(awk '/^## \[[0-9]+\.[0-9]+\.[0-9]+\]/{exit} { print }' "$CHANGELOG_FILE")
-TAIL=$(awk '/^## \[[0-9]+\.[0-9]+\.[0-9]+\]/{ print; exit }' "$CHANGELOG_FILE")
+BODY=$(awk '/^## \[[0-9]+\.[0-9]+\.[0-9]+\]/{ print; exit }' "$CHANGELOG_FILE")
+UNRELEASED_LINK=$(awk '/^\[Unreleased\]:/{ print; exit }' "$CHANGELOG_FILE")
+LINK=$(awk '/^\[[0-9]+\.[0-9]+\.[0-9]+\]:/{flag=1} flag' "$CHANGELOG_FILE")
 
 # Merge the Unreleased section from the draft into the CHANGELOG.md
 {
@@ -45,7 +51,11 @@ TAIL=$(awk '/^## \[[0-9]+\.[0-9]+\.[0-9]+\]/{ print; exit }' "$CHANGELOG_FILE")
     echo ""
     echo "$DRAFT"
     echo ""
-    echo "$TAIL"
+    echo "$BODY"
+    echo ""
+    echo "$UNRELEASED_LINK"
+    echo "$DRAFT_LINK"
+    echo "$LINK"
 } >"$TMP_FILE"
 
 mv "$TMP_FILE" "$CHANGELOG_FILE"
