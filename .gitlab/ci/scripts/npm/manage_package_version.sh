@@ -1,12 +1,14 @@
 #!/bin/bash
 
-# Title: check_and_bump_version.sh
+# Title: npm/manage_package_version.sh
 #
 # Description:
-#   This script checks if the package version in the registry is the same as the local version.
-#   If the versions are the same, it bumps the version based on the provided versionBumpHint.
+#   This script manages the versioning of a package in a package.json file.
+#   It checks if the package is published in a GitLab registry and compares the local version with the published version.
+#   If the package is published with the same version, it bumps the version based on the provided versionBumpHint.
 #   If the package is not published, it uses the local version.
-#   If the package is published with a different version, it uses the local version.
+#   If the local version is older than the published version, it aborts the publish to avoid version conflicts.
+#   If the local version is newer than the published version, it updates the package.json with the local version.
 
 # set -euo pipefail: Exit immediately if a command exits with a non-zero status.
 set -euo pipefail
