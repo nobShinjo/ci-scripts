@@ -18,6 +18,7 @@
 stages:
   - prepare
   - check
+  - changelog
   - publish
 
 variables:
@@ -102,6 +103,31 @@ publish_upm_check_version:
     - when: manual
     - when: never
 
+update_changelog:
+  stage: changelog
+  extends: .default_before_script
+  needs: ["publish_upm_check_version"]
+  script:
+    - VERSION=$(cat .next_version)
+    - echo "🚀 Updating changelog for version: $VERSION"
+
+    # Update CHANGELOG.md
+    - bash .gitlab/ci/scripts/npm/update_changelog.sh "$VERSION" "CHANGELOG.md"
+    - cp CHANGELOG.md "$DIST_DIR/CHANGELOG.md"
+
+    # Commit and push the updated changelog
+    - echo "📦 Committing changes..."
+    - git add CHANGELOG.md
+    - git commit -m "docs: update changelog for tag $VERSION"
+    - git push origin HEAD:$CI_COMMIT_REF_NAME
+
+    - echo "🚀 Changelog updated successfully for version $VERSION"
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: on_success
+    - when: manual
+    - when: never
+
 publish_upm_publish:
   # This stage publishes the package to the GitLab npm package registry.
   # It uses the version from the previous stage and publishes the package.
@@ -110,7 +136,7 @@ publish_upm_publish:
   # It pushes the changes to the main branch.
   stage: publish
   extends: .default_before_script
-  needs: ["publish_upm_check_version"]
+  needs: ["update_changelog"]
   script:
     - VERSION=$(cat .next_version)
     - echo "🚀 Publishing version: $VERSION"
