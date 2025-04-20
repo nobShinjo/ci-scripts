@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-# Title: merge_draft_into_changelog.sh
+# Title: changelog/merge.sh
 #
 # Description:
 #   This script merges the draft changelog file into the main CHANGELOG.md file.
