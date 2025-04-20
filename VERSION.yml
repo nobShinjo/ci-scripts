@@ -1,2 +1,2 @@
 version: 0.1.0
-increment: patch
+version_bump_hint: patch
