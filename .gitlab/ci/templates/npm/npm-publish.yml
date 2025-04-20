@@ -91,7 +91,7 @@ publish_upm_check_version:
   needs: ["publish_upm_prepare"]
   script:
     # Run the version check and bump script
-    - bash .gitlab/ci/scripts/check_and_bump_version.sh "$DIST_DIR/package.json" "$DIST_DIR" "$NPM_REGISTRY_URL" "$NPM_TOKEN"
+    - bash .gitlab/ci/scripts/npm/manage_package_version.sh "$DIST_DIR/package.json" "$DIST_DIR" "$NPM_REGISTRY_URL" "$NPM_TOKEN"
   artifacts:
     name: "next_version"
     paths:
