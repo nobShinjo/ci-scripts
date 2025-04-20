@@ -10,26 +10,11 @@
 # Features:
 #     - Generates a final changelog for the release using git-cliff.
 
+include:
+  - local: ".gitlab/ci/templates/changelog/common.yml"
+
 stages:
   - release
-
-variables:
-  GIT_AUTHOR_NAME: "gitlab-ci"
-  GIT_AUTHOR_EMAIL: "ci@example.com"
-  CLIFF_CONFIG_PATH: ".gitlab/ci/config/.cliff.toml"
-
-.default_before_script:
-  image: alpine:latest
-  before_script:
-    - apk add --no-cache git git-cliff
-    - echo "📦 Tool Versions:"
-    - git --version
-    - git-cliff --version
-
-    # set -euo pipefail: Exit immediately if a command exits with a non-zero status.
-    - set -euo pipefail
-    - git config --global user.name "$GIT_AUTHOR_NAME"
-    - git config --global user.email "$GIT_AUTHOR_EMAIL"
 
 generate_changelog_release:
   stage: release
