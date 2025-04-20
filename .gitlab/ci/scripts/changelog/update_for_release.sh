@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Title: changelog/update_changelog.sh
+# Title: changelog/update_for_release.sh
 #
 # Description:
 #   This script updates the changelog file for a new version release.

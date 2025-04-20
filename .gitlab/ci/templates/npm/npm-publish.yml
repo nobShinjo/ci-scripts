@@ -112,7 +112,7 @@ update_changelog:
     - echo "🚀 Updating changelog for version: $VERSION"
 
     # Update CHANGELOG.md
-    - bash .gitlab/ci/scripts/npm/update_changelog.sh "$VERSION" "CHANGELOG.md"
+    - bash .gitlab/ci/scripts/changelog/update_for_release.sh "$VERSION" "CHANGELOG.md"
     - cp CHANGELOG.md "$DIST_DIR/CHANGELOG.md"
 
     # Commit and push the updated changelog
