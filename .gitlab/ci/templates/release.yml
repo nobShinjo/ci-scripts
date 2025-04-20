@@ -1,0 +1,121 @@
+# Title: release.yml
+#
+# Description:
+# This script is designed to create a release for your project on GitLab.
+# It is used in a GitLab CI/CD pipeline.
+# It consists of four main stages:
+#     1. bump: Bump the version
+#     2. changelog: Update the changelog
+#     3. release: Create the release
+#
+# Features:
+#     - Automatically update the version based on the VERSION.yml file.
+#     - Automatically increment the version by comparing it with the already released version in the GitLab Releases.
+#     - Create a release on GitLab with the new version number.
+#     - Tag the commit with the new version number.
+
+stages:
+  - bump
+  - changelog
+  - release
+
+variables:
+  GIT_AUTHOR_NAME: "gitlab-ci"
+  GIT_AUTHOR_EMAIL: "ci@example.com"
+  VERSION_FILE: "VERSION.yml"
+
+.default_before_script:
+  image: alpine:latest
+  before_script:
+    # Install necessary tools
+    - apk add --no-cache git
+    - echo "📦 Tool Versions:"
+    - git --version
+
+    # set -euo pipefail: Exit immediately if a command exits with a non-zero status.
+    - set -euo pipefail
+    - git config --global user.name "$GIT_AUTHOR_NAME"
+    - git config --global user.email "$GIT_AUTHOR_EMAIL"
+
+bump_version:
+  # This stage is responsible for bumping the version of the project.
+  # It uses a script to read the VERSION.yml file and update the version accordingly.
+  # The script also creates a .next_version file that contains the new version number.
+  # The .next_version file is used in the changelog stage to update the changelog.
+  # The script also commits the changes to the VERSION.yml file and pushes them to the repository.
+  stage: bump
+  extends: .default_before_script
+  script:
+    - echo "🔍 Checking for $VERSION_FILE"
+    - bash .gitlab/scripts/manage-version.sh $VERSION_FILE
+    - echo "✅ Bumped version to $(cat .next_version)"
+  artifacts:
+    name: "next_version"
+    paths:
+      - .next_version
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: on_success
+    - when: manual
+
+update_changelog:
+  # This stage is responsible for updating the changelog.
+  # It uses a script to read the .next_version file and update the changelog accordingly.
+  # The script also commits the changes to the CHANGELOG.md file and pushes them to the repository.
+  stage: changelog
+  extends: .default_before_script
+  needs: ["bump_version"]
+  script:
+    - VERSION=$(cat .next_version)
+    - echo "🚀 Updating changelog for version: $VERSION"
+
+    # Update CHANGELOG.md
+    - bash .gitlab/ci/scripts/changelog/update_for_release.sh "$VERSION" "CHANGELOG.md"
+
+    # Commit and push the updated changelog
+    - echo "📦 Committing changes..."
+    - git add CHANGELOG.md
+    - git commit -m "docs: update changelog for tag $VERSION"
+    - git push origin HEAD:$CI_COMMIT_REF_NAME
+
+    - echo "🚀 Changelog updated successfully for version $VERSION"
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: on_success
+    - when: manual
+
+create_release:
+  # This stage is responsible for creating a release on GitLab.
+  # It uses the release-cli tool to create a release with the new version number.
+  # The release is created with the tag name and description from the CHANGELOG.md file.
+  # The release is created only when a tag is created.
+  # The release is created with the new version number and the changelog as the description.
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  needs: ["update_changelog"]
+  script:
+    - VERSION=$(cat .next_version)
+    - echo "🚀 Creating release for version: v$VERSION"
+    # Generate release notes from CHANGELOG.md
+    - bash .gitlab/ci/scripts/changelog/generate_release_note.sh "CHANGELOG.md" ".release_note"
+    - echo "📦 Creating release description..."
+    - echo "Release notes for v$VERSION" > .release_description
+    - echo "\n---\n" >> .release_description
+    - cat .release_note >> .release_description
+    # Tag the commit with the new version number
+    - echo "🏷️ Tagging: v$VERSION"
+    - git tag "v$VERSION"
+    - git push origin "v$VERSION"
+  release:
+    # See https://docs.gitlab.com/ee/ci/yaml/#release for available properties
+    tag_name: "v$VERSION"
+    description: ./.release_description
+  artifacts:
+    name: "release_note"
+    paths:
+      - .release_note
+      - .release_description
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: on_success
+    - when: manual

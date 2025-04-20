@@ -1,11 +1,13 @@
 #!/bin/bash
-set -euo pipefail
 
 # Title: changelog/merge.sh
 #
 # Description:
 #   This script merges the draft changelog file into the main CHANGELOG.md file.
 #   It ensures that the Unreleased section is updated with the latest changes from the draft.
+
+# set -euo pipefail: Exit immediately if a command exits with a non-zero status.
+set -euo pipefail
 
 # =========================
 # Configurations

@@ -78,7 +78,6 @@ publish_upm_prepare:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: on_success
     - when: manual
-    - when: never
 
 publish_upm_check_version:
   # This stage checks the version of the package to be published.
@@ -101,7 +100,6 @@ publish_upm_check_version:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: on_success
     - when: manual
-    - when: never
 
 update_changelog:
   stage: changelog
@@ -126,7 +124,6 @@ update_changelog:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: on_success
     - when: manual
-    - when: never
 
 publish_upm_publish:
   # This stage publishes the package to the GitLab npm package registry.
@@ -180,4 +177,3 @@ publish_upm_publish:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: on_success
     - when: manual
-    - when: never
