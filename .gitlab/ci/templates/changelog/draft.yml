@@ -1,0 +1,79 @@
+# Title: changelog/draft.yml
+#
+# Description:
+# This script is designed to generate a draft changelog using git-cliff.
+# It is used in a GitLab CI/CD pipeline.
+# It consists of one main stage:
+#     1. draft: Generate a draft changelog.
+#
+# Features:
+#     - Generates a draft changelog based on commit messages using git-cliff.
+#     - The draft is generated in the .changelog_draft.md file.
+#     - The draft is generated only for merge requests and feature branches.
+#     - The draft is generated only if the .cliff.toml file exists.
+#     - The draft is generated only if the job is triggered manually or automatically.
+
+stages:
+  - draft
+
+variables:
+  GIT_AUTHOR_NAME: "gitlab-ci"
+  GIT_AUTHOR_EMAIL: "ci@example.com"
+  CLIFF_CONFIG_PATH: ".gitlab/ci/config/.cliff.toml"
+
+.default_before_script:
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache git git-cliff
+    - echo "📦 Tool Versions:"
+    - git --version
+    - git-cliff --version
+
+    # set -euo pipefail: Exit immediately if a command exits with a non-zero status.
+    - set -euo pipefail
+    - git config --global user.name "$GIT_AUTHOR_NAME"
+    - git config --global user.email "$GIT_AUTHOR_EMAIL"
+
+generate_changelog_draft:
+  stage: draft
+  extends: .default_before_script
+  script:
+    - echo "📝 Generating changelog draft..."
+
+    # Ensure .cliff.toml exists (fail fast)
+    - |
+      if [ ! -f "$CLIFF_CONFIG_PATH" ]; then
+        echo "❌ $CLIFF_CONFIG_PATH not found. Aborting."
+        exit 1
+      fi
+
+    # Fetch main branch for comparison
+    - echo "📥 Fetching origin/main..."
+    - git fetch origin main
+
+    # Generate changelog draft
+    - git-cliff --unreleased --config $CLIFF_CONFIG_PATH > .changelog_draft.md
+    - echo "✅ Draft generated at .changelog_draft.md"
+    - echo "📌 Please review the draft changelog."
+  artifacts:
+    name: "changelog-draft"
+    paths:
+      - .changelog_draft.md
+    expire_in: 1 week
+
+  rules:
+    # Execute only if:
+    # 1. It's a merge request
+    # 2. The source branch is feature/*
+    # 3. .cliff.toml exists
+    - if: "$CI_MERGE_REQUEST_IID"
+      when: on_success
+    - if: '$CI_COMMIT_BRANCH =~ /^feature\//'
+      when: on_success
+    - exists:
+        - "$CLIFF_CONFIG_PATH"
+      when: on_success
+    # Manual trigger for other branches
+    - when: manual
+    # Skip this job unless all conditions above are satisfied
+    - when: never

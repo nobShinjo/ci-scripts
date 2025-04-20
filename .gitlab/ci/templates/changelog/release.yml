@@ -1,0 +1,60 @@
+# Title: changelog/release.yml
+#
+# Description:
+# This script is designed to generate and manage changelogs using git-cliff.
+# It is used in a GitLab CI/CD pipeline.
+# It consists of three main stages:
+#     1. release: Generate the final changelog.
+#
+#
+# Features:
+#     - Generates a final changelog for the release using git-cliff.
+
+stages:
+  - release
+
+variables:
+  GIT_AUTHOR_NAME: "gitlab-ci"
+  GIT_AUTHOR_EMAIL: "ci@example.com"
+  CLIFF_CONFIG_PATH: ".gitlab/ci/config/.cliff.toml"
+
+.default_before_script:
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache git git-cliff
+    - echo "📦 Tool Versions:"
+    - git --version
+    - git-cliff --version
+
+    # set -euo pipefail: Exit immediately if a command exits with a non-zero status.
+    - set -euo pipefail
+    - git config --global user.name "$GIT_AUTHOR_NAME"
+    - git config --global user.email "$GIT_AUTHOR_EMAIL"
+
+generate_changelog_release:
+  stage: release
+  extends: .default_before_script
+  script:
+    - echo "📝 Generating final changelog..."
+
+    - |
+      if [ ! -f "$CLIFF_CONFIG_PATH" ]; then
+        echo "❌ $CLIFF_CONFIG_PATH not found. Aborting."
+        exit 1
+      fi
+
+    # Fetch main branch for comparison
+    - echo "📥 Fetching origin/main..."
+    - git fetch origin main
+
+    # Generate final changelog
+    - git-cliff --config $CLIFF_CONFIG_PATH  > CHANGELOG.md
+    - echo "✅ Final changelog generated at CHANGELOG.md"
+    - echo "📌 Please review the final changelog."
+  artifacts:
+    name: "changelog-release"
+    paths:
+      - CHANGELOG.md
+    expire_in: 1 week
+  rules:
+    - when: manual
