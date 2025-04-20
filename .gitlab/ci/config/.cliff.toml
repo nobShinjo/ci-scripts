@@ -56,7 +56,12 @@ footer = """
       Full Changelog: [{{ release.previous.version }}...HEAD]({{ self::remote_url() }}/-/compare/{{ release.previous.version }}...HEAD)
     {% else -%}
       {# 1st. release. -#}
-      Full Changelog: [{{ release.commit_id | truncate(length=7, end="") }}]({{ self::remote_url() }}/-/commits/{{ release.commit_id }})
+      {% if release.commit_id %}
+        Full Changelog: [{{ release.commit_id | truncate(length=7, end="") }}]({{ self::remote_url() }}/-/commits/{{ release.commit_id }})
+      {% else %}
+        {%- set head_commit = get_env(name="CI_COMMIT_SHA", default="HEAD") -%}
+        Full Changelog: [{{ head_commit | truncate(length=7, end="") }}]({{ self::remote_url() }}/-/commits/{{ head_commit }})
+      {% endif -%}
     {% endif -%}
   {% endif -%}
 {% endfor %}
