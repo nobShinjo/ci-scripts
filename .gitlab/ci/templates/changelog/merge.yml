@@ -22,19 +22,19 @@ merge_changelog_draft:
   stage: merge
   extends: .default_before_script
   script:
-    - echo "📝 Merging changelog draft into CHANGELOG.md..."
+    - echo "📝 Merging changelog draft into $CHANGELOG_FILE..."
 
     # Merge the draft into CHANGELOG.md
     - bash .gitlab/ci/scripts/changelog/merge.sh
 
     # Commit & push updated CHANGELOG.md
-    - git add CHANGELOG.md
+    - git add $CHANGELOG_FILE
     - git commit -m "docs: update changelog"
     - git push origin "$CI_COMMIT_BRANCH"
-    - echo "✅ Changelog merged into CHANGELOG.md"
+    - echo "✅ Changelog merged into $CHANGELOG_FILE"
   rules:
     # Execute only if:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_PIPELINE_SOURCE'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       exists:
         - .changelog_draft.md
       when: on_success

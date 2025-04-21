@@ -19,16 +19,17 @@ TMP_FILE=".changelog_merged.tmp.md"
 # =========================
 # Main script
 # =========================
-echo "🔄 Merging draft into existing CHANGELOG.md..."
+echo "🔄 Merging draft into existing $CHANGELOG_FILE..."
 
 if [ ! -f "$DRAFT_FILE" ]; then
     echo "❌ $DRAFT_FILE is not found."
     exit 1
 fi
 
-if [ ! -f "CHANGELOG.md" ] || [ ! -s "CHANGELOG.md" ]; then
-    echo "⚠️ CHANGELOG.md does not exist or is empty. Creating new CHANGELOG.md from draft."
-    cp .changelog_draft.md CHANGELOG.md
+if [ ! -f "$CHANGELOG_FILE" ] || [ ! -s "$CHANGELOG_FILE" ]; then
+    echo "⚠️ $CHANGELOG_FILE does not exist or is empty. Creating new $CHANGELOG_FILE from draft."
+
+    cp .changelog_draft.md $CHANGELOG_FILE
     exit 0
 fi
 
