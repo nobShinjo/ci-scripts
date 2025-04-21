@@ -88,7 +88,7 @@ update_changelog:
     - echo "📦 Committing changes..."
     - git add $CHANGELOG_FILE
     - git commit -m "docs: update changelog for tag $VERSION [ci skip]"
-    - git push origin HEAD:$CI_COMMIT_REF_NAME --force-with-lease
+    - git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME --force-with-lease
 
     - echo "🚀 Changelog updated successfully for version $VERSION"
   artifacts:
@@ -127,7 +127,7 @@ create_release:
     # Tag the commit with the new version number
     - echo "🏷️ Tagging: v$VERSION"
     - git tag "v$VERSION"
-    - git push origin "v$VERSION"
+    - git push -o ci.skip origin "v$VERSION"
     # Create the release on GitLab
     # See https://docs.gitlab.com/ee/ci/yaml/#release for available properties
     - echo "🚀 Creating release on GitLab..."
