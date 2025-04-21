@@ -25,7 +25,7 @@ generate_changelog_draft:
   script:
     - echo "📝 Generating changelog draft..."
 
-    # Ensure .cliff.toml exists (fail fast)
+    # Ensure .cliff.toml exists (fail fast).
     - |
       if [ ! -f "$CLIFF_CONFIG_PATH" ]; then
         echo "❌ $CLIFF_CONFIG_PATH not found. Aborting."
@@ -36,16 +36,21 @@ generate_changelog_draft:
     - echo "📥 Fetching origin/main..."
     - git fetch origin main
 
-    # Generate changelog draft
-    - git-cliff --unreleased --config $CLIFF_CONFIG_PATH > .changelog_draft.md
-    - echo "✅ Draft generated at .changelog_draft.md"
-    - echo "📌 Please review the draft changelog."
-  artifacts:
-    name: "changelog-draft"
-    paths:
-      - .changelog_draft.md
-    expire_in: 1 week
+    # Generate Unreleased draft changelog.
+    # NOTE: --prepend is used to prepend the changelog draft to the existing CHANGELOG.md file.
+    - git-cliff \
+      --unreleased \
+      --config $CLIFF_CONFIG_PATH \
+      --prepend \
+      "$CHANGELOG_FILE"
+    - echo "📜 Changelog draft generated in $CHANGELOG_FILE."
 
+    # Commit & push updated CHANGELOG.md.
+    - echo "📦 Committing changes..."
+    - git add $CHANGELOG_FILE
+    - git commit -m "docs: update changelog draft [ci skip]"
+    - git push origin HEAD:$CI_COMMIT_REF_NAME --force-with-lease
+    - echo "📌 Please review the draft changelog."
   rules:
     # Execute only if:
     # 1. It's a merge request

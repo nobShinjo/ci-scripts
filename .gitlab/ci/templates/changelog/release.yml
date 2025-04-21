@@ -32,8 +32,8 @@ generate_changelog_release:
     - git fetch origin main
 
     # Generate final changelog
-    - git-cliff --config $CLIFF_CONFIG_PATH  > CHANGELOG.md
-    - echo "✅ Final changelog generated at CHANGELOG.md"
+    - git-cliff --config $CLIFF_CONFIG_PATH  > $CHANGELOG_FILE
+    - echo "✅ Final changelog generated at $CHANGELOG_FILE"
     - echo "📌 Please review the final changelog."
   artifacts:
     name: "changelog-release"

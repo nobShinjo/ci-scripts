@@ -2,6 +2,9 @@ variables:
   GIT_AUTHOR_NAME: "gitlab-ci"
   GIT_AUTHOR_EMAIL: "ci@example.com"
   CLIFF_CONFIG_PATH: ".gitlab/ci/config/.cliff.toml"
+  CHANGELOG_FILE: "CHANGELOG.md"
+  # NOTE: GIT_DEPTH is set to 0 to fetch all history for changelog generation.
+  GIT_DEPTH: 0
 
 .default_before_script:
   image: alpine:latest
