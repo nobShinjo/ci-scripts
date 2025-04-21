@@ -3,10 +3,11 @@
 # Description:
 # This script is designed to publish Unity packages to the GitLab npm package registry.
 # It is used in a GitLab CI/CD pipeline.
-# It consists of three main stages:
+# It consists of four main stages:
 #     1. prepare: Prepare the package
 #     2. check: Check the version
-#     3. publish: Publish the package
+#     3. changelog: Update the changelog
+#     4. publish: Publish the package
 #
 # Features:
 #     - Copies necessary files for Unity custom packages, README.md, and CHANGELOG.md to create a distribution directory.
@@ -103,6 +104,11 @@ publish_upm_check_version:
     - when: manual
 
 update_changelog:
+  # This stage updates the changelog for the package.
+  # It uses the version from the previous stage and updates the CHANGELOG.md file.
+  # It commits the changes to the CHANGELOG.md file and pushes them to the repository.
+  # It also creates a new tag for the release.
+  # Finally, it pushes the changes to the main branch.
   stage: changelog
   extends: .default_before_script
   needs: ["publish_upm_check_version"]
