@@ -34,12 +34,13 @@ variables:
   image: "node:18-alpine"
   before_script:
     # Install necessary tools
-    - apk add --no-cache jq curl git
+    - apk add --no-cache jq curl git bash
     - echo "📦 Tool Versions:"
     - jq --version
     - curl --version | head -n1
     - git --version
     - npm -v
+    - bash --version
 
     # set -euo pipefail: Exit immediately if a command exits with a non-zero status.
     - set -euo pipefail

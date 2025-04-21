@@ -6,10 +6,11 @@ variables:
 .default_before_script:
   image: alpine:latest
   before_script:
-    - apk add --no-cache git git-cliff
+    - apk add --no-cache git git-cliff bash
     - echo "📦 Tool Versions:"
     - git --version
     - git-cliff --version
+    - bash --version
 
     # set -euo pipefail: Exit immediately if a command exits with a non-zero status.
     - set -euo pipefail
