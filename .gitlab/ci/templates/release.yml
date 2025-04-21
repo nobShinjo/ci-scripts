@@ -28,9 +28,12 @@ variables:
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   before_script:
     # Install necessary tools
-    - apk add --no-cache git bash
+    - apk add --no-cache git bash yq
     - echo "📦 Tool Versions:"
     - git --version
+    - bash --version
+    - release-cli --version
+    - yq --version
 
     # set -euo pipefail: Exit immediately if a command exits with a non-zero status.
     - set -euo pipefail

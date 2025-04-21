@@ -72,8 +72,9 @@ function update_version_in_yaml() {
     local next_version_file=$2
 
     # Update the version in the file
-    sed -i "s/^version: .*/version: $version/" "$next_version_file"
-    sed -i "s/^version_bump_hint: .*/version_bump_hint: patch/" "$next_version_file"
+    yq eval \
+        ".version = \"${version}\" | .version_bump_hint = \"patch\"" \
+        -i "${next_version_file}"
 }
 
 # Title: write_next_version
@@ -114,13 +115,29 @@ function apply_version_bump() {
     echo "📝 New version: $NEXT_VERSION (based on current: $current_version)"
 }
 
+# Title: validate_version
+#
+# Description:
+#   This function validates the version format.
+# Arguments:
+#  $1: The version to validate (e.g., "1.0.0").
+# Returns:
+#   0 if valid, 1 if invalid.
+# Usage:
+#   validate_version "1.0.0"
+#   validate_version "1.0"
 function validate_version() {
     local version=$1
     # Check if the version is in the format X.Y.Z
     if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-        echo "❌ Error: Invalid version format. Expected format: X.Y.Z"
-        exit 1
+        return 1
     fi
+    # Check if the version is greater than 0.0.0
+    IFS='.' read -r major minor patch <<<"$version"
+    if ((10#$major == 0 && 10#$minor == 0 && 10#$patch == 0)); then
+        return 1
+    fi
+    return 0
 }
 
 # =========================
@@ -146,15 +163,11 @@ fi
 # Validate the version format
 if ! validate_version "$VERSION"; then
     echo "❌ Error: Invalid version format in $VERSION_FILE."
+    echo "Version should be in the format following Semantic Versioning (e.g., 1.0.0)."
     exit 1
 fi
 
 IFS='.' read -r MAJOR MINOR PATCH <<<"$VERSION"
-
-if ! [[ "$MAJOR" =~ ^[0-9]+$ && "$MINOR" =~ ^[0-9]+$ && "$PATCH" =~ ^[0-9]+$ ]]; then
-    echo "❌ Error: Invalid version format."
-    exit 1
-fi
 
 # Get the latest git tag.
 LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
