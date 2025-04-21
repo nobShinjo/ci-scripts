@@ -1,4 +1,4 @@
-# Title: release.yml
+# Title: project-release.yml
 #
 # Description:
 # This script is designed to create a release for your project on GitLab.
@@ -60,7 +60,7 @@ bump_version:
     - .default_rules
   script:
     - echo "🔍 Checking for $VERSION_FILE"
-    - bash .gitlab/ci/scripts/manage_version.sh $VERSION_FILE
+    - bash .gitlab/ci/scripts/release/manage_version.sh $VERSION_FILE
     - echo "✅ Bumped version to $(cat .next_version)"
   artifacts:
     name: "next_version"
@@ -82,11 +82,11 @@ update_changelog:
     - echo "🚀 Updating changelog for version: $VERSION"
 
     # Update CHANGELOG.md
-    - bash .gitlab/ci/scripts/changelog/update_for_release.sh "$VERSION" "CHANGELOG.md"
+    - bash .gitlab/ci/scripts/changelog/update_for_release.sh "$VERSION" "$CHANGELOG_FILE"
 
     # Commit and push the updated changelog
     - echo "📦 Committing changes..."
-    - git add CHANGELOG.md
+    - git add $CHANGELOG_FILE
     - git commit -m "docs: update changelog for tag $VERSION [ci skip]"
     - git push origin HEAD:$CI_COMMIT_REF_NAME --force-with-lease
 
@@ -119,7 +119,7 @@ create_release:
         exit 0
       fi
     # Generate release notes from CHANGELOG.md
-    - bash .gitlab/ci/scripts/changelog/generate_release_note.sh "CHANGELOG.md" ".release_note"
+    - bash .gitlab/ci/scripts/changelog/generate_release_note.sh "$CHANGELOG_FILE" ".release_note"
     - echo "📦 Creating release description..."
     - echo "Release notes for v$VERSION" > .release_description
     - printf "\n---\n" >> .release_description
