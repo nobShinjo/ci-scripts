@@ -34,7 +34,7 @@ generate_changelog_draft:
 
     # Fetch main branch for comparison.
     - echo "📥 Fetching origin/main..."
-    - git fetch origin main
+    - git fetch --depth=0 origin main
 
     # Generate Unreleased draft changelog.
     # NOTE: --prepend is used to prepend the changelog draft to the existing CHANGELOG.md file.
@@ -46,10 +46,17 @@ generate_changelog_draft:
     - echo "📜 Changelog draft generated in $CHANGELOG_FILE."
 
     # Commit & push updated CHANGELOG.md.
+    - |
+      if git diff --quiet $CHANGELOG_FILE; then
+        echo "ℹ️ No changes in $CHANGELOG_FILE, skipping commit."
+        exit 0
+      fi
     - echo "📦 Committing changes..."
     - git add $CHANGELOG_FILE
     - git commit -m "docs: update changelog draft [ci skip]"
-    - git push origin HEAD:$CI_COMMIT_REF_NAME --force-with-lease
+    - git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME
+    - echo "📦 Pushed changes to $CI_COMMIT_REF_NAME."
+    - echo "✅ Changelog draft committed successfully."
     - echo "📌 Please review the draft changelog."
   rules:
     # Execute only if:
