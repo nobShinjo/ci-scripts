@@ -3,9 +3,8 @@
 # Description:
 # This script is designed to generate and manage changelogs using git-cliff.
 # It is used in a GitLab CI/CD pipeline.
-# It consists of three main stages:
+# It consists of one main stage:
 #     1. release: Generate the final changelog.
-#
 #
 # Features:
 #     - Generates a final changelog for the release using git-cliff.

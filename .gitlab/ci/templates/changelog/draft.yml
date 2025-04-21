@@ -32,7 +32,7 @@ generate_changelog_draft:
         exit 1
       fi
 
-    # Fetch main branch for comparison
+    # Fetch main branch for comparison.
     - echo "📥 Fetching origin/main..."
     - git fetch origin main
 
@@ -58,7 +58,7 @@ generate_changelog_draft:
     - exists:
         - "$CLIFF_CONFIG_PATH"
       when: on_success
-    # Manual trigger for other branches
+    # Manual trigger for other branches.
     - when: manual
-    # Skip this job unless all conditions above are satisfied
+    # Skip this job unless all conditions above are satisfied.
     - when: never
