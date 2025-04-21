@@ -120,7 +120,7 @@ commit_parsers = [
   { message = "^Merge (branch|remote-tracking branch|pull request)", skip = true },
   { message = "^Merge ![0-9]+", skip = true },
   { message = "^bump:", skip = true },
-  { message = "^\\[?skip[- ]?ci\\]?$/i", skip = true },
+  { message = "(?i)^\\[?(?:skip ci|ci skip)\\]?$", skip = true },
 
   # Keep a Changelog groups
   ## Breaking changes
