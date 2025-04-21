@@ -119,7 +119,7 @@ create_release:
         exit 0
       fi
     # Generate release notes from CHANGELOG.md
-    - bash .gitlab/ci/scripts/changelog/generate_release_note.sh "$CHANGELOG_FILE" ".release_note"
+    - bash .gitlab/ci/scripts/release/generate_release_note.sh "$CHANGELOG_FILE" ".release_note"
     - echo "📦 Creating release description..."
     - echo "Release notes for v$VERSION" > .release_description
     - printf "\n---\n" >> .release_description

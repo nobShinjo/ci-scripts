@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Title: changelog/generate_release_note.sh
+# Title: release/generate_release_note.sh
 #
 # Description:
 #   This script generates a release note file from the changelog file.
