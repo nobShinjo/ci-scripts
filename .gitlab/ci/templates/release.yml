@@ -60,7 +60,7 @@ bump_version:
     - .default_rules
   script:
     - echo "🔍 Checking for $VERSION_FILE"
-    - bash .gitlab/ci/scripts/manage-version.sh $VERSION_FILE
+    - bash .gitlab/ci/scripts/manage_version.sh $VERSION_FILE
     - echo "✅ Bumped version to $(cat .next_version)"
   artifacts:
     name: "next_version"

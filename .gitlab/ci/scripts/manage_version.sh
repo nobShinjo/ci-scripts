@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Title: manage-version.sh
+# Title: manage_version.sh
 #
 # Description:
 # This script is used to manage versioning for a project.
