@@ -10,7 +10,8 @@ variables:
   image: alpine:latest
   before_script:
     - apk add --no-cache git git-cliff bash
-    - echo "📦 Tool Versions:"
+    - |
+      echo "📦 Tool Versions:"
     - git --version
     - git-cliff --version
     - bash --version

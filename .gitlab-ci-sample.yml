@@ -1,0 +1,7 @@
+stages:
+  - fetch
+
+include:
+  - project: "LineSimulation/unity-npm/ci-scripts"
+    ref: "feature/add-ci-templates"
+    file: "/.gitlab/ci/templates/fetch/fetch-ci.yml"

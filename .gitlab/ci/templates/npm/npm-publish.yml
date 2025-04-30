@@ -36,7 +36,8 @@ variables:
   before_script:
     # Install necessary tools
     - apk add --no-cache jq curl git bash
-    - echo "📦 Tool Versions:"
+    - |
+      echo "📦 Tool Versions:"
     - jq --version
     - curl --version | head -n1
     - git --version
@@ -123,8 +124,10 @@ update_changelog:
     # Commit and push the updated changelog
     - echo "📦 Committing changes..."
     - git add CHANGELOG.md
-    - git commit -m "docs: update changelog for tag $VERSION"
-    - git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME
+    - |
+      git commit -m "docs: update changelog for tag $VERSION"
+    - |
+      git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME
 
     - echo "🚀 Changelog updated successfully for version $VERSION"
   rules:
@@ -143,7 +146,8 @@ publish_upm_publish:
   needs: ["update_changelog"]
   script:
     - VERSION=$(cat .next_version)
-    - echo "🚀 Publishing version: $VERSION"
+    - |
+      echo "🚀 Publishing version: $VERSION"
 
     # Commit and push the changes to package.json if it was modified
     - echo "🔍 Checking if package.json was modified..."
@@ -158,7 +162,8 @@ publish_upm_publish:
       fi
 
     # Tag the commit with the new version number
-    - echo "🏷️ Tagging: v$VERSION"
+    - |
+      echo "🏷️ Tagging: v$VERSION"
     - git tag "v$VERSION"
     - git push -o ci.skip origin "v$VERSION"
 

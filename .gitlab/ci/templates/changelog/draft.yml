@@ -53,8 +53,10 @@ generate_changelog_draft:
       fi
     - echo "📦 Committing changes..."
     - git add $CHANGELOG_FILE
-    - git commit -m "docs: update changelog draft [ci skip]"
-    - git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME
+    - |
+      git commit -m "docs: update changelog draft [ci skip]"
+    - |
+      git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME
     - echo "📦 Pushed changes to $CI_COMMIT_REF_NAME."
     - echo "✅ Changelog draft committed successfully."
     - echo "📌 Please review the draft changelog."

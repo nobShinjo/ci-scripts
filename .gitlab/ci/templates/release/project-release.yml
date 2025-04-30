@@ -29,7 +29,8 @@ variables:
   before_script:
     # Install necessary tools
     - apk add --no-cache git bash yq
-    - echo "📦 Tool Versions:"
+    - |
+      echo "📦 Tool Versions:"
     - git --version
     - bash --version
     - release-cli --version
@@ -79,7 +80,8 @@ update_changelog:
     - bump_version
   script:
     - VERSION=$(cat .next_version)
-    - echo "🚀 Updating changelog for version: $VERSION"
+    - |
+      echo "🚀 Updating changelog for version: $VERSION"
 
     # Update CHANGELOG.md
     - bash .gitlab/ci/scripts/changelog/update_for_release.sh "$VERSION" "$CHANGELOG_FILE"
@@ -87,9 +89,9 @@ update_changelog:
     # Commit and push the updated changelog
     - echo "📦 Committing changes..."
     - git add $CHANGELOG_FILE
-    - git commit -m "docs: update changelog for tag $VERSION [ci skip]"
+    - |
+      git commit -m "docs: update changelog for tag $VERSION [ci skip]"
     - git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME --force-with-lease
-
     - echo "🚀 Changelog updated successfully for version $VERSION"
   artifacts:
     name: "next_version"
@@ -125,7 +127,8 @@ create_release:
     - printf "\n---\n" >> .release_description
     - cat .release_note >> .release_description
     # Tag the commit with the new version number
-    - echo "🏷️ Tagging: v$VERSION"
+    - |
+      echo "🏷️ Tagging: v$VERSION"
     - git tag "v$VERSION"
     - git push -o ci.skip origin "v$VERSION"
     # Create the release on GitLab

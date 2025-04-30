@@ -43,8 +43,10 @@ generate_changelog_release:
       fi
     - echo "📦 Committing changes..."
     - git add $CHANGELOG_FILE
-    - git commit -m "docs: update changelog for release [ci skip]"
-    - git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME
+    - |
+      git commit -m "docs: update changelog for release [ci skip]"
+    - |
+      git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME
     - echo "📦 Pushed changes to $CI_COMMIT_REF_NAME."
     - echo "✅ Changelog updated successfully."
     - echo "📌 Please review the final changelog."
