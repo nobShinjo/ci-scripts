@@ -19,7 +19,7 @@
 stages:
   - prepare
   - update
-  - publish
+  - release
 
 variables:
   PACKAGE_NAME: "my-package-name"
@@ -141,7 +141,7 @@ publish_upm_publish:
   # It also tags the commit with the new version number.
   # Finally, it checks if package.json was modified and commits the changes if necessary.
   # It pushes the changes to the main branch.
-  stage: publish
+  stage: release
   extends: .default_before_script
   needs: ["update_changelog"]
   script:
