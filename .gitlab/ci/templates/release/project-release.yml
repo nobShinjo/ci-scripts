@@ -91,7 +91,8 @@ update_changelog:
     - git add $CHANGELOG_FILE
     - |
       git commit -m "docs: update changelog for tag $VERSION [ci skip]"
-    - git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME --force-with-lease
+    - |
+      git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME --force-with-lease
     - echo "🚀 Changelog updated successfully for version $VERSION"
   artifacts:
     name: "next_version"
@@ -113,7 +114,8 @@ create_release:
     - update_changelog
   script:
     - VERSION=$(cat .next_version)
-    - echo "🚀 Creating release for version: v$VERSION"
+    - |
+      echo "🚀 Creating release for version: v$VERSION"
     # Check if the release already exists
     - |
       if git rev-parse --verify "v$VERSION" >/dev/null 2>&1; then
