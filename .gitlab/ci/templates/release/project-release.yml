@@ -15,8 +15,8 @@
 #     - Tag the commit with the new version number.
 
 stages:
-  - bump
-  - changelog
+  - prepare
+  - update
   - release
 
 variables:
@@ -55,7 +55,7 @@ bump_version:
   # The script also creates a .next_version file that contains the new version number.
   # The .next_version file is used in the changelog stage to update the changelog.
   # The script also commits the changes to the VERSION.yml file and pushes them to the repository.
-  stage: bump
+  stage: prepare
   extends:
     - .default_job
     - .default_rules
@@ -72,7 +72,7 @@ update_changelog:
   # This stage is responsible for updating the changelog.
   # It uses a script to read the .next_version file and update the changelog accordingly.
   # The script also commits the changes to the CHANGELOG.md file and pushes them to the repository.
-  stage: changelog
+  stage: update
   extends:
     - .default_job
     - .default_rules
@@ -141,7 +141,7 @@ create_release:
       --tag-name "v$VERSION" \
       --description-file ./.release_description
     - echo "✅ Release created successfully for version v$VERSION"
-  artifacts:
-    reports:
-      release: .release_description
-    expire_in: 1 day
+  # artifacts:
+  #   reports:
+  #     release: .release_description
+  #   expire_in: 1 day

@@ -18,8 +18,7 @@
 
 stages:
   - prepare
-  - check
-  - changelog
+  - update
   - publish
 
 variables:
@@ -89,7 +88,7 @@ publish_upm_check_version:
   # If the published version is behind, it uses the local version.
   # It also updates the versionBumpHint in package.json to remove it after the version bump.
   # Finally, it saves the next version to a file for use in the publish stage.
-  stage: check
+  stage: prepare
   extends: .default_before_script
   needs: ["publish_upm_prepare"]
   script:
@@ -110,7 +109,7 @@ update_changelog:
   # It commits the changes to the CHANGELOG.md file and pushes them to the repository.
   # It also creates a new tag for the release.
   # Finally, it pushes the changes to the main branch.
-  stage: changelog
+  stage: update
   extends: .default_before_script
   needs: ["publish_upm_check_version"]
   script:

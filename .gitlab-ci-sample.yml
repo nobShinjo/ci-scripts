@@ -1,8 +1,8 @@
 stages:
   - fetch
-  - changelog
-  - build
-  - test
+  - prepare
+  - draft
+  - update
   - release
 
 variables:
