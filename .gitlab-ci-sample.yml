@@ -24,22 +24,12 @@ include:
     file: "/.gitlab/ci/templates/release/project-release.yml"
 
 changelog:
-  stage: changelog
+  stage: update
   script:
     - scripts/changelog/update_for_release.sh
   only:
     refs:
       - main
-
-build:
-  stage: build
-  script:
-    - echo "Build step placeholder"
-
-test:
-  stage: test
-  script:
-    - echo "Test step placeholder"
 
 release:
   stage: release
