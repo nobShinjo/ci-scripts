@@ -115,7 +115,8 @@ update_changelog:
   needs: ["publish_upm_check_version"]
   script:
     - VERSION=$(cat .next_version)
-    - echo "🚀 Updating changelog for version: $VERSION"
+    - |
+      echo "🚀 Updating changelog for version: $VERSION"
 
     # Update CHANGELOG.md
     - bash .gitlab/ci/scripts/changelog/update_for_release.sh "$VERSION" "CHANGELOG.md"
