@@ -17,8 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 body = """
 {%- macro remote_url() -%}
-  {# get_env(name="CI_PROJECT_URL") -#}
-  https://gitlab.local/your-group/your-project
+  {% set url = get_env(name="CI_PROJECT_URL") %}
+  {% if url is not none -%}
+    {{ url }}
+  {% else -%}
+    https://gitlab.ubuntu.local/your-group/your-project
+  {% endif -%}
 {%- endmacro -%}
 
 {% if version -%}
@@ -48,7 +52,12 @@ body = """
 
 footer = """
 {%- macro remote_url() -%}
-  https://gitlab.local/your-group/your-project
+  {% set url = get_env(name="CI_PROJECT_URL") %}
+  {% if url is not none -%}
+    {{ url }}
+  {% else -%}
+    https://gitlab.ubuntu.local/your-group/your-project
+  {% endif -%}
 {%- endmacro -%}
 
 {% if releases | length > 0 %}
