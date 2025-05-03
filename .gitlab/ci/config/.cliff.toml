@@ -33,8 +33,13 @@ body = """
 
   {% for commit in commits %}
     {%- set msg = commit.message | split(pat="\n") | first | trim -%}
-    {%- set hdr = commit.raw_message | split(pat="\n") | first | split(pat=":") | first | trim -%}
-    - {{ hdr }}: {{ msg | upper_first }} ({{ commit.id | truncate(length=7, end="") }})
+    {%- set header_line = commit.raw_message | split(pat="\n") | first | trim -%}
+    {% if ":" in header_line -%}
+      {%- set hdr = header_line | split(pat=":") | first | trim -%}
+      - {{ hdr }}: {{ msg | upper_first }} ({{ commit.id | truncate(length=7, end="") }})
+    {% else -%}
+      - {{ msg | upper_first }} ({{ commit.id | truncate(length=7, end="") }})
+    {% endif -%}
   {% endfor -%}
 {% endfor %}
 ---
