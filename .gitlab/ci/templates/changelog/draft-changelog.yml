@@ -5,7 +5,7 @@
 # It is used in a GitLab CI/CD pipeline.
 # It consists of one main stage:
 #     1. fetch: Fetch CI scripts from the ci-scripts repository.
-#     2. update: Generate a draft changelog based on commit messages.
+#     2. draft: Generate a draft changelog based on commit messages.
 #
 # Features:
 #     - Generates a draft changelog based on commit messages using git-cliff.
@@ -16,7 +16,7 @@
 
 stages:
   - fetch
-  - update
+  - draft
 
 variables:
   CLIFF_CONFIG_PATH: ".gitlab/ci/config/.cliff.toml"
@@ -65,7 +65,7 @@ fetch_ci:
     - !reference [.git-config, before_script]
 
 generate_changelog_draft:
-  stage: update
+  stage: draft
   image: "alpine:latest"
   extends:
     - .default_before_script
