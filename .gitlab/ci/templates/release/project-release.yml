@@ -95,7 +95,7 @@ update_changelog_for_release:
     - .project_release_before_script
     - .project_release_default_rules
   needs: ["bump_version"]
-  depends:
+  dependencies:
     - fetch_ci_for_release
   script:
     # Update CHANGELOG.md
@@ -128,7 +128,7 @@ create_release:
     - .project_release_before_script
     - .project_release_default_rules
   needs: ["update_changelog_for_release"]
-  depends:
+  dependencies:
     - fetch_ci_for_release
   script:
     - |
