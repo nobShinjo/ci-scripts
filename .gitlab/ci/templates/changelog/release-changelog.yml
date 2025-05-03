@@ -94,3 +94,8 @@ generate_changelog_release:
       echo "📦 Pushed changes to $CI_COMMIT_REF_NAME."
       echo "✅ Changelog updated successfully."
       echo "📌 Please review the final changelog."
+  artifacts:
+    paths:
+      - $CHANGELOG_FILE
+    when: always
+    expire_in: 1 week

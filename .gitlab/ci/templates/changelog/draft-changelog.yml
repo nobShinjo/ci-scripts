@@ -117,3 +117,8 @@ generate_changelog_draft:
       echo "📦 Pushed changes to $CI_COMMIT_REF_NAME."
       echo "✅ Changelog draft committed successfully."
       echo "📌 Please review the draft changelog."
+  artifacts:
+    paths:
+      - $CHANGELOG_FILE
+    when: always
+    expire_in: 1 week
