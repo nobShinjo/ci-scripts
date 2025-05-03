@@ -38,8 +38,9 @@ include:
       bash --version
 
 .default_rules:
-  # Manual trigger for other branches.
-  - when: manual
+  rules:
+    # Manual trigger for other branches.
+    - when: manual
 
 fetch_ci:
   # This job is responsible for fetching the CI scripts from the ci-scripts repository.

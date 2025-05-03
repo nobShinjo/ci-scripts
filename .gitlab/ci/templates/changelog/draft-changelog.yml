@@ -29,8 +29,7 @@ include:
   - .gitlab/ci/templates/git/git-config.yml
 
 .default_before_script:
-  variables:
-    - !reference [.git-config, variables]
+  variables: !reference [.git-config, variables]
   before_script:
     # Install git, configure GitLab CI job token, and update CA certificates.
     - !reference [.git-config, before_script]
@@ -42,17 +41,18 @@ include:
       bash --version
 
 .default_rules:
-  # Execute only if:
-  # 1. It's a merge request
-  # 2. The source branch is feature/*
-  - if: "$CI_MERGE_REQUEST_IID"
-    when: on_success
-  - if: '$CI_COMMIT_BRANCH =~ /^feature\//'
-    when: on_success
-  # Manual trigger for other branches.
-  - when: manual
-  # Skip this job unless all conditions above are satisfied.
-  - when: never
+  rules:
+    # Execute only if:
+    # 1. It's a merge request
+    # 2. The source branch is feature/*
+    - if: "$CI_MERGE_REQUEST_IID"
+      when: on_success
+    - if: '$CI_COMMIT_BRANCH =~ /^feature\//'
+      when: on_success
+    # Manual trigger for other branches.
+    - when: manual
+    # Skip this job unless all conditions above are satisfied.
+    - when: never
 
 fetch_ci:
   # This job is responsible for fetching the CI scripts from the ci-scripts repository.

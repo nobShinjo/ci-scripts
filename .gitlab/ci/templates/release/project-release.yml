@@ -29,8 +29,7 @@ variables:
   VERSION_FILE: "VERSION.yml"
 
 .default_before_script:
-  variables:
-    - !reference [.git-config, variables]
+  variables: !reference [.git-config, variables]
   before_script:
     # Install git, configure GitLab CI job token, and update CA certificates.
     - !reference [.git-config, before_script]
