@@ -160,6 +160,6 @@ create_release:
       echo "✅ Release created successfully for version v$VERSION"
   artifacts:
     name: "release_description"
-    path:
+    paths:
       - .release_description
     expire_in: 1 day
