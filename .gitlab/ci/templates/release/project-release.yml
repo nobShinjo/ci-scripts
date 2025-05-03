@@ -27,6 +27,7 @@ include:
 
 variables:
   VERSION_FILE: "VERSION.yml"
+  CHANGELOG_FILE: "CHANGELOG.md"
 
 .project_release_before_script:
   variables: !reference [.git-config, variables]
@@ -80,7 +81,7 @@ bump_version:
       bash .gitlab/ci/scripts/release/manage_version.sh $VERSION_FILE
       echo "✅ Bumped version to $(cat .next_version)"
   artifacts:
-    name: "next_version"
+    name: "bump_version"
     paths:
       - .next_version
     expire_in: 1 day
@@ -118,9 +119,10 @@ update_changelog_for_release:
       git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME --force-with-lease
       echo "🚀 Changelog updated successfully for version $VERSION"
   artifacts:
-    name: "next_version"
+    name: "update_changelog_for_release"
     paths:
       - .next_version
+      - $CHANGELOG_FILE
     expire_in: 1 day
 
 create_release:
@@ -170,7 +172,9 @@ create_release:
       --description-file ./.release_description
       echo "✅ Release created successfully for version v$VERSION"
   artifacts:
-    name: "release_description"
+    name: "create_release"
     paths:
       - .release_description
+      - .release_note
+      - $CHANGELOG_FILE
     expire_in: 1 day

@@ -30,6 +30,7 @@ variables:
   PACKAGE_NAME: "$CI_PACKAGE_NAME"
   PUBLISH_SOURCE_DIR: "Assets/${PACKAGE_NAME}"
   PACKAGE_JSON_PATH: "Assets/${PACKAGE_NAME}/package.json"
+  CHANGELOG_FILE: "CHANGELOG.md"
   DIST_DIR: "dist"
   NPM_REGISTRY_URL: "https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/"
 
@@ -102,9 +103,14 @@ publish_upm_prepare:
       echo "🧹 Rebuilding $DIST_DIR..."
       rm -rf "$DIST_DIR" && mkdir -p "$DIST_DIR"
       cp "$PACKAGE_JSON_PATH" "$DIST_DIR/package.json"
-      for f in README.md CHANGELOG.md; do [ -f "$f" ] && cp "$f" "$DIST_DIR/" || echo "⚠️ $f missing"; done
+      for f in README.md $CHANGELOG_FILE; do [ -f "$f" ] && cp "$f" "$DIST_DIR/" || echo "⚠️ $f missing"; done
       cp -r "$PUBLISH_SOURCE_DIR"/* "$DIST_DIR/" || echo "⚠️ No source files found in $PUBLISH_SOURCE_DIR"
       echo "✅ $DIST_DIR rebuilt successfully."
+  artifacts:
+    name: "publish_upm_prepare"
+    paths:
+      - "$DIST_DIR"
+    expire_in: 1 day
 
 publish_upm_check_version:
   # This stage checks the version of the package to be published.
@@ -128,7 +134,7 @@ publish_upm_check_version:
       bash +x .gitlab/ci/scripts/npm/manage_package_version.sh "$DIST_DIR/package.json" "$DIST_DIR" "$NPM_REGISTRY_URL" "$NPM_TOKEN"
       echo "✅ Version check and bump completed."
   artifacts:
-    name: "next_version"
+    name: "publish_upm_check_version"
     paths:
       - .next_version
     expire_in: 1 day
@@ -152,8 +158,8 @@ update_changelog_for_npm:
     - |
       VERSION=$(cat .next_version)
       echo "🚀 Updating changelog for version: $VERSION"
-      bash +x .gitlab/ci/scripts/changelog/update_for_release.sh "$VERSION" "CHANGELOG.md"
-      cp CHANGELOG.md "$DIST_DIR/CHANGELOG.md"
+      bash +x .gitlab/ci/scripts/changelog/update_for_release.sh "$VERSION" "$CHANGELOG_FILE"
+      cp $CHANGELOG_FILE "$DIST_DIR/$CHANGELOG_FILE"
     # Commit and push the updated changelog
     - |
       echo "📦 Committing changes..."
@@ -161,6 +167,13 @@ update_changelog_for_npm:
       git commit -m "docs: update changelog for tag $VERSION"
       git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME
       echo "🚀 Changelog updated successfully for version $VERSION"
+  artifacts:
+    name: "update_changelog_for_npm"
+    paths:
+      - .next_version
+      - $CHANGELOG_FILE
+      - $DIST_DIR
+    expire_in: 1 day
 
 publish_upm_publish:
   # This stage publishes the package to the GitLab npm package registry.
@@ -213,3 +226,10 @@ publish_upm_publish:
       rm -f .npmrc
       cd ..
       echo "✅ Published successfully!"
+  artifacts:
+    name: "publish_upm_publish"
+    paths:
+      - .next_version
+      - $CHANGELOG_FILE
+      - $DIST_DIR
+    expire_in: 1 day
