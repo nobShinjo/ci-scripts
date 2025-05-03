@@ -1,4 +1,4 @@
 include:
   - project: "LineSimulation/unity-npm/ci-scripts"
     ref: "feature/add-ci-templates"
-    file: "/.gitlab-ci.yaml"
+    file: "/.gitlab-ci.yml"
