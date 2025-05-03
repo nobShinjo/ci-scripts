@@ -138,7 +138,7 @@ update_changelog:
   extends:
     - .default_before_script
     - .default_rules
-  needs: ["fetch", "publish_upm_prepare", "publish_upm_check_version"]
+  needs: ["fetch_ci", "publish_upm_prepare", "publish_upm_check_version"]
   script:
     # Update CHANGELOG.md
     - |
@@ -165,7 +165,7 @@ publish_upm_publish:
   extends:
     - .default_before_script
     - .default_rules
-  needs: ["fetch", "update_changelog"]
+  needs: ["fetch_ci", "update_changelog"]
   script:
     # release the package
     - |
