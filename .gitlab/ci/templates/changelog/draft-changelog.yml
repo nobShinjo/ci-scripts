@@ -97,7 +97,7 @@ generate_changelog_draft:
       --prepend \
       "$CHANGELOG_FILE"
       echo "📜 Changelog draft generated in $CHANGELOG_FILE."
-    # Commit & push updated CHANGELOG.md.
+    # Check for changes in the changelog draft.
     - |
       echo "🔄 Checking for changes in $CHANGELOG_FILE..."
       git add $CHANGELOG_FILE

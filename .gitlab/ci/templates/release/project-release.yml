@@ -103,10 +103,17 @@ update_changelog_for_release:
       VERSION=$(cat .next_version)
       echo "🚀 Updating changelog for version: $VERSION"
       bash +x .gitlab/ci/scripts/changelog/update_for_release.sh "$VERSION" "$CHANGELOG_FILE"
+    # Check for changes in the CHANGELOG.md.
+    - |
+      echo "🔄 Checking for changes in $CHANGELOG_FILE..."
+      git add $CHANGELOG_FILE
+      if git diff --quiet $CHANGELOG_FILE; then
+        echo "ℹ️ No changes in $CHANGELOG_FILE, skipping commit."
+        exit 0
+      fi
     # Commit and push the updated changelog
     - |
       echo "📦 Committing changes..."
-      git add $CHANGELOG_FILE
       git commit -m "docs: update changelog for tag $VERSION [ci skip]"
       git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME --force-with-lease
       echo "🚀 Changelog updated successfully for version $VERSION"
