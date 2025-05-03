@@ -19,11 +19,12 @@
 
 ## 🧩 ステージ構成
 
-| ステージ    | 説明                                               |
-| ----------- | -------------------------------------------------- |
-| `bump`      | `VERSION.yml` を読み込み、バージョンを計算・更新   |
-| `changelog` | `.next_version` を参照して `CHANGELOG.md` を更新   |
-| `release`   | タグ作成後、`release-cli` で GitLab Release を生成 |
+| ステージ  | 説明                                               |
+| --------- | -------------------------------------------------- |
+| `fetch`   | 最新のGitLab CI設定を読み込み、`.gitlab`に格納する |
+| `prepare` | `VERSION.yml` を読み込み、バージョンを計算・更新   |
+| `update`  | `.next_version` を参照して `CHANGELOG.md` を更新   |
+| `release` | タグ作成後、`release-cli` で GitLab Release を生成 |
 
 ---
 
@@ -100,6 +101,8 @@ versionBumpHint: patch # patch, minor, major のいずれかを指定
 
 ## 📎 関連ファイル
 
+- `.gitlab-ci.yml`
+- `.gitlab/ci/templates/fetch/fetch-ci.yml`
 - `.gitlab/ci/templates/project-release.yml`  
 - `.gitlab/ci/scripts/changelog/update_for_release.sh`  
 - `.gitlab/ci/scripts/release/manage_version.sh`  

@@ -1,0 +1,47 @@
+# Title: git-config.yml
+#
+# Description:
+# This script is designed to configure Git for the CI/CD pipeline.
+# It sets up the Git author name and email, installs necessary tools, and configures CA certificates.
+# It is used in a GitLab CI/CD pipeline.
+
+.git-config:
+  variables:
+    GIT_AUTHOR_NAME: "gitlab-ci"
+    GIT_AUTHOR_EMAIL: "ci@example.com"
+    CA_STORE_DIR: "/usr/local/share/ca-certificates"
+    CI_REPOSITORY: "https://gitlab.ubuntu.local/linesimulation/unity-npm/ci-scripts.git"
+  before_script:
+    # Install git and configure GitLab CI job token
+    - |
+      echo "⚙️ Setting up Git configuration..."
+      echo "📦 Install necessary tools..."
+      apk add --no-cache git ca-certificates > /dev/null 2>&1
+      echo "📦 Tool Versions:"
+      git --version
+      ca-certificates --version
+    # Configure GitLab CI job token
+    - |
+      echo "🔑 Configure GitLab CI job token..."
+      cat <<EOF > ~/.netrc
+      machine ${CI_SERVER_HOST}
+        login gitlab-ci-token
+        password ${CI_JOB_TOKEN}
+      EOF
+      chmod 600 ~/.netrc
+    # Update CA certificates
+    - |
+      echo "🔄 Update CA certificates..."
+      CERT_PATH="${CI_SERVER_TLS_CA_FILE:-/etc/gitlab-runner/certs/root.crt}"
+      echo "Using CA cert: $CERT_PATH"
+      if [ ! -f "$CERT_PATH" ]; then
+        echo "❌ CA certificate not found at $CERT_PATH"
+        exit 1;
+      fi
+      cp "$CERT_PATH" "$CA_STORE_DIR/$(basename "$CERT_PATH")"
+      update-ca-certificates
+    # Configure Git to use the CA certificate
+    - |
+      echo "🔑 Configure Git SSL CA info..."
+      git config --global http.sslCAInfo "$CERT_PATH"
+      echo "✅ Successfully set up Git configuration."

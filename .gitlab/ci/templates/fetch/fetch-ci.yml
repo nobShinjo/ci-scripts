@@ -13,63 +13,29 @@
 #     Add the `Group` or `Project`.
 #
 
-stages:
-  - fetch
-
-variables:
-  CA_STORE_DIR: "/usr/local/share/ca-certificates"
-  CI_REPOSITORY: "https://gitlab.ubuntu.local/linesimulation/unity-npm/ci-scripts.git"
-
-fetch_ci:
-  stage: fetch
-  image: "node:18-alpine"
-  before_script:
-    # Install necessary tools
-    - echo "📦 Install necessary tools"
-    - apk add --no-cache git ca-certificates
-    # Configure GitLab CI job token
-    - echo "🔑 Configure GitLab CI job token..."
-    - |
-      cat <<EOF > ~/.netrc
-      machine ${CI_SERVER_HOST}
-        login gitlab-ci-token
-        password ${CI_JOB_TOKEN}
-      EOF
-    - chmod 600 ~/.netrc
-    # Update CA certificates
-    - echo "🔄 Update CA certificates..."
-    - |
-      CERT_PATH="${CI_SERVER_TLS_CA_FILE:-/etc/gitlab-runner/certs/root.crt}"
-    - |
-      echo "Using CA cert: $CERT_PATH"
-    - |
-      if [ ! -f "$CERT_PATH" ]; then
-        echo "❌ CA certificate not found at $CERT_PATH"
-        exit 1;
-      fi
-    - cp "$CERT_PATH" "$CA_STORE_DIR/$(basename "$CERT_PATH")"
-    - update-ca-certificates
-    # Configure Git to use the CA certificate
-    - echo "🔑 Configure Git SSL CA info..."
-    - git config --global http.sslCAInfo "$CERT_PATH"
+.fetch_ci:
+  variables:
+    CA_STORE_DIR: "/usr/local/share/ca-certificates"
+    CI_REPOSITORY: "https://gitlab.ubuntu.local/linesimulation/unity-npm/ci-scripts.git"
   script:
     # If `ci-scripts` directory exists, fetch the latest changes.
     # Otherwise, clone the repository.
-    - echo "🔄 Fetching CI scripts..."
     - |
+      echo "🔄 Fetching CI scripts..."
       if [ -d ".gitlab" ]; then
         echo "🔄 CI scripts found. Fetching latest changes..."
         cd .gitlab && git fetch --all && git reset --hard origin/main && cd ..
         echo "✅ CI scripts updated successfully."
         exit 0
       fi
-    - echo "📥 CI scripts not found. Cloning repository..."
-    - git clone --depth=1 --branch main "$CI_REPOSITORY" tmp_ci
-    - mkdir -p .gitlab
-    - cp -r tmp_ci/.gitlab/* .gitlab/
-    - rm -rf tmp_ci
-    - echo "✅ CI scripts cloned successfully."
+      echo "📥 CI scripts not found. Cloning repository..."
+      git clone --depth=1 --branch main "$CI_REPOSITORY" tmp_ci
+      mkdir -p .gitlab
+      cp -r tmp_ci/.gitlab/* .gitlab/
+      rm -rf tmp_ci
+      echo "✅ CI scripts cloned successfully."
   artifacts:
+    name: "ci-scripts"
     paths:
       - .gitlab/
-    expire_in: 1 hour
+    expire_in: 1 day

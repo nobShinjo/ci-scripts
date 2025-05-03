@@ -1,0 +1,111 @@
+# Title: changelog/draft-changelog.yml
+#
+# Description:
+# This script is designed to generate a draft changelog using git-cliff.
+# It is used in a GitLab CI/CD pipeline.
+# It consists of one main stage:
+#     1. fetch: Fetch CI scripts from the ci-scripts repository.
+#     2. update: Generate a draft changelog based on commit messages.
+#
+# Features:
+#     - Generates a draft changelog based on commit messages using git-cliff.
+#     - The draft is generated in the .changelog_draft.md file.
+#     - The draft is generated only for merge requests and feature branches.
+#     - The draft is generated only if the .cliff.toml file exists.
+#     - The draft is generated only if the job is triggered manually or automatically.
+
+stages:
+  - fetch
+  - update
+
+variables:
+  CLIFF_CONFIG_PATH: ".gitlab/ci/config/.cliff.toml"
+  CHANGELOG_FILE: "CHANGELOG.md"
+  # NOTE: GIT_DEPTH is set to 0 to fetch all history for changelog generation.
+  GIT_DEPTH: 0
+
+include:
+  - .gitlab/ci/templates/git/git-config.yml
+
+.default_before_script:
+  before_script:
+    # Install git, configure GitLab CI job token, and update CA certificates.
+    - !reference [.git-config, before_script]
+    # Install necessary tools
+    - |
+      apk add --no-cache git-cliff bash
+      echo "📦 Tool Versions:"
+      git-cliff --version
+      bash --version
+
+.default_rules:
+  # Execute only if:
+  # 1. It's a merge request
+  # 2. The source branch is feature/*
+  - if: "$CI_MERGE_REQUEST_IID"
+    when: on_success
+  - if: '$CI_COMMIT_BRANCH =~ /^feature\//'
+    when: on_success
+  # Manual trigger for other branches.
+  - when: manual
+  # Skip this job unless all conditions above are satisfied.
+  - when: never
+
+fetch_ci:
+  # This job is responsible for fetching the CI scripts from the ci-scripts repository.
+  # It clones the ci-scripts repository, copies the necessary files to the current directory.
+  # This ensures that the latest CI scripts are always used.  stage: fetch
+  stage: fetch
+  image: "alpine:latest"
+  extends:
+    - .default_rules
+    - .fetch_ci
+  before_script:
+    # Install git, configure GitLab CI job token, and update CA certificates.
+    - !reference [.git-config, before_script]
+
+generate_changelog_draft:
+  stage: update
+  image: "alpine:latest"
+  extends:
+    - .default_before_script
+    - .default_rules
+  script:
+    # Generate changelog draft using git-cliff.
+    - |
+      echo "📝 Generating changelog draft..."
+      # Ensure .cliff.toml exists (fail fast).
+      if [ ! -f "$CLIFF_CONFIG_PATH" ]; then
+        echo "❌ $CLIFF_CONFIG_PATH not found. Aborting."
+        exit 1
+      fi
+    # Fetch main branch for comparison.
+    - |
+      echo "📥 Fetching origin/main..."
+      git fetch --depth=0 origin main
+    # Generate Unreleased draft changelog.
+    # NOTE: --prepend is used to prepend the changelog draft to the existing CHANGELOG.md file.
+    - |
+      echo "📝 Generating changelog draft..."
+      git-cliff \
+      --unreleased \
+      --config $CLIFF_CONFIG_PATH \
+      --prepend \
+      "$CHANGELOG_FILE"
+      echo "📜 Changelog draft generated in $CHANGELOG_FILE."
+    # Commit & push updated CHANGELOG.md.
+    - |
+      echo "🔄 Checking for changes in $CHANGELOG_FILE..."
+      if git diff --quiet $CHANGELOG_FILE; then
+        echo "ℹ️ No changes in $CHANGELOG_FILE, skipping commit."
+        exit 0
+      fi
+    # Commit & push changes.
+    - |
+      echo "📦 Committing changes..."
+      git add $CHANGELOG_FILE
+      git commit -m "docs: update changelog draft [ci skip]"
+      git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME
+      echo "📦 Pushed changes to $CI_COMMIT_REF_NAME."
+      echo "✅ Changelog draft committed successfully."
+      echo "📌 Please review the draft changelog."

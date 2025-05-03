@@ -3,6 +3,10 @@
         "elif",
         "netrc",
         "pipefail",
-        "userconfig"
+        "userconfig",
+        "vecho"
+    ],
+    "yaml.customTags": [
+        "!reference sequence"
     ]
 }

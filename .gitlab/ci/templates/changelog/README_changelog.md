@@ -1,4 +1,4 @@
-# 📘 README.md – CHANGELOG自動生成テンプレート (`changelog/draft.yml`, `changelog/release.yml`)
+# 📘 README.md – CHANGELOG自動生成テンプレート (`changelog/draft-changelog.yml`, `changelog/release-changelog.yml`)
 
 ## 🚀 概要
 
@@ -25,11 +25,19 @@
 
 ## 🧩 テンプレート一覧 & ステージ構成
 
-| テンプレート              | ステージ | 説明                                                                                   |
-| ------------------------- | -------- | -------------------------------------------------------------------------------------- |
-| **common.yml**            | –        | 共通 `before_script`／変数定義 (`CLIFF_CONFIG_PATH`, `CHANGELOG_FILE`, `GIT_DEPTH` 等) |
-| **changelog/draft.yml**   | draft    | MR または `feature/*` ブランチ向けドラフト生成 (`git-cliff --unreleased --prepend`)    |
-| **changelog/release.yml** | release  | 最終 CHANGELOG 出力 (`git-cliff` 上書き)／手動実行推奨                                 |
+### `changelog/draft-changelog.yml`
+
+| ステージ | 説明                                                                                |
+| -------- | ----------------------------------------------------------------------------------- |
+| `fetch`  | 最新のGitLab CI設定を読み込み、`.gitlab`に格納する                                  |
+| `draft`  | MR または `feature/*` ブランチ向けドラフト生成 (`git-cliff --unreleased --prepend`) |
+
+### `changelog/release-changelog.yml`
+
+| ステージ  | 説明                                                   |
+| --------- | ------------------------------------------------------ |
+| `fetch`   | 最新のGitLab CI設定を読み込み、`.gitlab`に格納する     |
+| `release` | 最終 CHANGELOG 出力 (`git-cliff` 上書き)／手動実行推奨 |
 
 ---
 
@@ -59,9 +67,8 @@
 │         │         └─ generate_release_note.sh
 │         └─ templates/
 │              └─ changelog/
-│                   ├─ common.yml
-│                   ├─ draft.yml
-│                   └─ release.yml
+│                   ├─ draft-changelog.yml
+│                   └─ release-changelog.yml
 ├─ CHANGELOG.md
 └─ .gitlab-ci.yml
 ```
@@ -70,14 +77,14 @@
 
 ## ⚙️ 利用方法
 
-1. `.gitlab/ci/templates/changelog` 以下に `common.yml`, `draft.yml`, `release.yml` を配置する。
+1. `.gitlab/ci/templates/changelog` 以下に `draft-changelog.yml`, `release-changelog.yml` を配置する。
 2. プロジェクトのルート `.gitlab-ci.yml` で以下のようにinclude する。
 
    ```yaml
    include:
      - local: ".gitlab/ci/templates/changelog/common.yml"
-     - local: ".gitlab/ci/templates/changelog/draft.yml"
-     - local: ".gitlab/ci/templates/changelog/release.yml"
+     - local: ".gitlab/ci/templates/changelog/draft-changelog.yml"
+     - local: ".gitlab/ci/templates/changelog/release-changelog.yml"
    ```  
 
 3. **Draft**: マージリクエスト MR 作成時、かつ `feature/*` ブランチ push で自動実行する。

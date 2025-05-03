@@ -4,9 +4,10 @@
 # This script is designed to create a release for your project on GitLab.
 # It is used in a GitLab CI/CD pipeline.
 # It consists of four main stages:
-#     1. bump: Bump the version
-#     2. changelog: Update the changelog
-#     3. release: Create the release
+#     1. fetch: Fetch the CI scripts from the ci-scripts repository.
+#     2. prepare: Bump the version of the project based on the VERSION.yml file.
+#     3. update: Update the changelog based on the new version number.
+#     4. release: Create a release on GitLab with the new version number.
 #
 # Features:
 #     - Automatically update the version based on the VERSION.yml file.
@@ -15,31 +16,31 @@
 #     - Tag the commit with the new version number.
 
 stages:
+  - fetch
   - prepare
   - update
   - release
 
+include:
+  - .gitlab/ci/templates/fetch/fetch-ci.yml
+  - .gitlab/ci/templates/git/git-config.yml
+
 variables:
-  GIT_AUTHOR_NAME: "gitlab-ci"
-  GIT_AUTHOR_EMAIL: "ci@example.com"
   VERSION_FILE: "VERSION.yml"
 
-.default_job:
-  image: registry.gitlab.com/gitlab-org/release-cli:latest
+.default_before_script:
+  variables:
+    - !reference [.git-config, variables]
   before_script:
+    # Install git, configure GitLab CI job token, and update CA certificates.
+    - !reference [.git-config, before_script]
     # Install necessary tools
-    - apk add --no-cache git bash yq
     - |
+      echo "📦 Install necessary tools for project-release..."
+      apk add --no-cache bash yq > /dev/null 2>&1
       echo "📦 Tool Versions:"
-    - git --version
-    - bash --version
-    - release-cli --version
-    - yq --version
-
-    # set -euo pipefail: Exit immediately if a command exits with a non-zero status.
-    - set -euo pipefail
-    - git config --global user.name "$GIT_AUTHOR_NAME"
-    - git config --global user.email "$GIT_AUTHOR_EMAIL"
+      yq --version
+      bash --version
 
 .default_rules:
   rules:
@@ -49,6 +50,19 @@ variables:
     # This job will run manually for other branches.
     - when: manual
 
+fetch_ci:
+  # This job is responsible for fetching the CI scripts from the ci-scripts repository.
+  # It clones the ci-scripts repository, copies the necessary files to the current directory.
+  # This ensures that the latest CI scripts are always used.  stage: fetch
+  stages: fetch
+  image: "alpine:latest"
+  extends:
+    - .default_rules
+    - .fetch_ci
+  before_script:
+    # Install git, configure GitLab CI job token, and update CA certificates.
+    - !reference [.git-config, before_script]
+
 bump_version:
   # This stage is responsible for bumping the version of the project.
   # It uses a script to read the VERSION.yml file and update the version accordingly.
@@ -56,48 +70,50 @@ bump_version:
   # The .next_version file is used in the changelog stage to update the changelog.
   # The script also commits the changes to the VERSION.yml file and pushes them to the repository.
   stage: prepare
+  image: "alpine:latest"
   extends:
-    - .default_job
+    - .default_before_script
     - .default_rules
+  needs: ["fetch_ci"]
   script:
-    - echo "🔍 Checking for $VERSION_FILE"
-    - bash .gitlab/ci/scripts/release/manage_version.sh $VERSION_FILE
-    - echo "✅ Bumped version to $(cat .next_version)"
+    - |
+      echo "🔍 Checking for $VERSION_FILE"
+      bash .gitlab/ci/scripts/release/manage_version.sh $VERSION_FILE
+      echo "✅ Bumped version to $(cat .next_version)"
   artifacts:
     name: "next_version"
     paths:
       - .next_version
+    expire_in: 1 day
 
 update_changelog:
   # This stage is responsible for updating the changelog.
   # It uses a script to read the .next_version file and update the changelog accordingly.
   # The script also commits the changes to the CHANGELOG.md file and pushes them to the repository.
   stage: update
+  image: "alpine:latest"
   extends:
-    - .default_job
+    - .default_before_script
     - .default_rules
-  needs:
-    - bump_version
+  needs: ["fetch_ci", "bump_version"]
   script:
-    - VERSION=$(cat .next_version)
-    - |
-      echo "🚀 Updating changelog for version: $VERSION"
-
     # Update CHANGELOG.md
-    - bash .gitlab/ci/scripts/changelog/update_for_release.sh "$VERSION" "$CHANGELOG_FILE"
-
+    - |
+      VERSION=$(cat .next_version)
+      echo "🚀 Updating changelog for version: $VERSION"
+      bash .gitlab/ci/scripts/changelog/update_for_release.sh "$VERSION" "$CHANGELOG_FILE"
     # Commit and push the updated changelog
-    - echo "📦 Committing changes..."
-    - git add $CHANGELOG_FILE
     - |
+      echo "📦 Committing changes..."
+      git add $CHANGELOG_FILE
       git commit -m "docs: update changelog for tag $VERSION [ci skip]"
-    - |
       git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME --force-with-lease
-    - echo "🚀 Changelog updated successfully for version $VERSION"
+      echo "🚀 Changelog updated successfully for version $VERSION"
   artifacts:
     name: "next_version"
     paths:
       - .next_version
+    expire_in: 1 day
 
 create_release:
   # This stage is responsible for creating a release on GitLab.
@@ -106,15 +122,14 @@ create_release:
   # The release is created only when a tag is created.
   # The release is created with the new version number and the changelog as the description.
   stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
   extends:
-    - .default_job
+    - .default_before_script
     - .default_rules
-  needs:
-    - bump_version
-    - update_changelog
+  needs: ["fetch_ci", "bump_version", "update_changelog"]
   script:
-    - VERSION=$(cat .next_version)
     - |
+      VERSION=$(cat .next_version)
       echo "🚀 Creating release for version: v$VERSION"
     # Check if the release already exists
     - |
@@ -123,25 +138,29 @@ create_release:
         exit 0
       fi
     # Generate release notes from CHANGELOG.md
-    - bash .gitlab/ci/scripts/release/generate_release_note.sh "$CHANGELOG_FILE" ".release_note"
-    - echo "📦 Creating release description..."
-    - echo "Release notes for v$VERSION" > .release_description
-    - printf "\n---\n" >> .release_description
-    - cat .release_note >> .release_description
+    - |
+      echo "📜 Generating release notes..."
+      bash .gitlab/ci/scripts/release/generate_release_note.sh "$CHANGELOG_FILE" ".release_note"
+      echo "📦 Creating release description..."
+      echo "Release notes for v$VERSION" > .release_description
+      printf "\n---\n" >> .release_description
+      cat .release_note >> .release_description
     # Tag the commit with the new version number
     - |
       echo "🏷️ Tagging: v$VERSION"
-    - git tag "v$VERSION"
-    - git push -o ci.skip origin "v$VERSION"
+      git tag "v$VERSION"
+      git push -o ci.skip origin "v$VERSION"
     # Create the release on GitLab
     # See https://docs.gitlab.com/ee/ci/yaml/#release for available properties
-    - echo "🚀 Creating release on GitLab..."
-    - release-cli create \
+    - |
+      echo "🚀 Creating release on GitLab..."
+      release-cli create \
       --name "v$VERSION" \
       --tag-name "v$VERSION" \
       --description-file ./.release_description
-    - echo "✅ Release created successfully for version v$VERSION"
-  # artifacts:
-  #   reports:
-  #     release: .release_description
-  #   expire_in: 1 day
+      echo "✅ Release created successfully for version v$VERSION"
+  artifacts:
+    name: "release_description"
+    path:
+      - .release_description
+    expire_in: 1 day
