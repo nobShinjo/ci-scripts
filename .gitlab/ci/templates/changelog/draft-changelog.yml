@@ -77,7 +77,7 @@ generate_changelog_draft:
   script:
     # Generate changelog draft using git-cliff.
     - |
-      echo "📝 Generating changelog draft..."
+      echo "🔍 Checking for .cliff.toml..."
       # Ensure .cliff.toml exists (fail fast).
       if [ ! -f "$CLIFF_CONFIG_PATH" ]; then
         echo "❌ $CLIFF_CONFIG_PATH not found. Aborting."
