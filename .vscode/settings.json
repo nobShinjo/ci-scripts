@@ -3,6 +3,7 @@
         "elif",
         "netrc",
         "pipefail",
+        "unshallow",
         "userconfig",
         "vecho"
     ],
