@@ -31,7 +31,7 @@ include:
     - !reference [.git-config, before_script]
     # Install necessary tools
     - |
-      apk add --no-cache git-cliff bash
+      apk add --no-cache git-cliff bash > /dev/null 2>&1
       echo "📦 Tool Versions:"
       git-cliff --version
       bash --version
@@ -72,7 +72,7 @@ generate_changelog_release:
     # Fetch main branch for comparison
     - |
       echo "📥 Fetching origin/main..."
-      git fetch --depth=0 origin main
+      git fetch --unshallow origin main
     # Generate final changelog
     - |
       echo "📝 Generating final changelog..."

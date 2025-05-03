@@ -35,7 +35,7 @@ include:
     - !reference [.git-config, before_script]
     # Install necessary tools
     - |
-      apk add --no-cache git-cliff bash
+      apk add --no-cache git-cliff bash > /dev/null 2>&1
       echo "📦 Tool Versions:"
       git-cliff --version
       bash --version

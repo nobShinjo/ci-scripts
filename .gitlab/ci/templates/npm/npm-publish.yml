@@ -41,7 +41,7 @@ variables:
     # Install necessary tools
     - |
       echo "📦 Install necessary tools for npm-publish..."
-      apk add --no-cache jq curl bash
+      apk add --no-cache jq curl bash > /dev/null 2>&1
       echo "📦 Tool Versions:"
       jq --version
       curl --version | head -n1
