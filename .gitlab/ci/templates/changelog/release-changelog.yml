@@ -36,7 +36,7 @@ include:
       git-cliff --version
       bash --version
 
-.default_rules:
+.release_changelog_default_rules:
   rules:
     # Manual trigger for other branches.
     - when: manual
@@ -48,7 +48,7 @@ fetch_ci:
   stage: fetch
   image: "alpine:latest"
   extends:
-    - .default_rules
+    - .release_changelog_default_rules
     - .fetch_ci
   before_script:
     # Install git, configure GitLab CI job token, and update CA certificates.
@@ -59,7 +59,7 @@ generate_changelog_release:
   image: "alpine:latest"
   extends:
     - .default_before_script
-    - .default_rules
+    - .release_changelog_default_rules
   needs: [fetch_ci]
   script:
     # Release changelog generation

@@ -28,7 +28,7 @@ include:
 variables:
   VERSION_FILE: "VERSION.yml"
 
-.default_before_script:
+.project_release_before_script:
   variables: !reference [.git-config, variables]
   before_script:
     # Install git, configure GitLab CI job token, and update CA certificates.
@@ -41,7 +41,7 @@ variables:
       yq --version
       bash --version
 
-.default_rules:
+.project_release_default_rules:
   rules:
     # This job will run only on the default branch (e.g., main or master).
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -56,7 +56,7 @@ fetch_ci:
   stage: fetch
   image: "alpine:latest"
   extends:
-    - .default_rules
+    - .project_release_default_rules
     - .fetch_ci
   before_script:
     # Install git, configure GitLab CI job token, and update CA certificates.
@@ -71,8 +71,8 @@ bump_version:
   stage: prepare
   image: "alpine:latest"
   extends:
-    - .default_before_script
-    - .default_rules
+    - .project_release_before_script
+    - .project_release_default_rules
   needs: ["fetch_ci"]
   script:
     - |
@@ -85,15 +85,15 @@ bump_version:
       - .next_version
     expire_in: 1 day
 
-update_changelog:
+update_changelog_for_release:
   # This stage is responsible for updating the changelog.
   # It uses a script to read the .next_version file and update the changelog accordingly.
   # The script also commits the changes to the CHANGELOG.md file and pushes them to the repository.
   stage: update
   image: "alpine:latest"
   extends:
-    - .default_before_script
-    - .default_rules
+    - .project_release_before_script
+    - .project_release_default_rules
   needs: ["bump_version"]
   script:
     # Update CHANGELOG.md
@@ -123,9 +123,9 @@ create_release:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   extends:
-    - .default_before_script
-    - .default_rules
-  needs: ["update_changelog"]
+    - .project_release_before_script
+    - .project_release_default_rules
+  needs: ["update_changelog_for_release:"]
   script:
     - |
       VERSION=$(cat .next_version)

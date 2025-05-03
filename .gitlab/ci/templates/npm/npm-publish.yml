@@ -33,7 +33,7 @@ variables:
   DIST_DIR: "dist"
   NPM_REGISTRY_URL: "https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/"
 
-.default_before_script:
+.npm_publish_before_script:
   variables: !reference [.git-config, variables]
   before_script:
     # Install git, configure GitLab CI job token, and update CA certificates.
@@ -48,7 +48,7 @@ variables:
       npm -v
       bash --version
 
-.default_rules:
+.npm_publish_default_rules:
   rules:
     # This job will run only on the default branch (e.g., main or master).
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -63,7 +63,7 @@ fetch_ci:
   stage: fetch
   image: "alpine:latest"
   extends:
-    - .default_rules
+    - .npm_publish_default_rules
     - .fetch_ci
   before_script:
     # Install git, configure GitLab CI job token, and update CA certificates.
@@ -81,8 +81,8 @@ publish_upm_prepare:
   stage: prepare
   image: "alpine:latest"
   extends:
-    - .default_before_script
-    - .default_rules
+    - .npm_publish_before_script
+    - .npm_publish_default_rules
   needs: [fetch_ci]
   script:
     # Check if the package.json file exists in the specified path
@@ -112,8 +112,8 @@ publish_upm_check_version:
   stage: prepare
   image: "alpine:latest"
   extends:
-    - .default_before_script
-    - .default_rules
+    - .npm_publish_before_script
+    - .npm_publish_default_rules
   needs: ["publish_upm_prepare"]
   script:
     # Run the version check and bump script
@@ -127,7 +127,7 @@ publish_upm_check_version:
       - .next_version
     expire_in: 1 day
 
-update_changelog:
+update_changelog_for_npm:
   # This stage updates the changelog for the package.
   # It uses the version from the previous stage and updates the CHANGELOG.md file.
   # It commits the changes to the CHANGELOG.md file and pushes them to the repository.
@@ -136,8 +136,8 @@ update_changelog:
   stage: update
   image: "alpine:latest"
   extends:
-    - .default_before_script
-    - .default_rules
+    - .npm_publish_before_script
+    - .npm_publish_default_rules
   needs: ["publish_upm_check_version"]
   script:
     # Update CHANGELOG.md
@@ -163,9 +163,9 @@ publish_upm_publish:
   stage: release
   image: "node:18-alpine"
   extends:
-    - .default_before_script
-    - .default_rules
-  needs: ["update_changelog"]
+    - .npm_publish_before_script
+    - .npm_publish_default_rules
+  needs: ["update_changelog_for_npm:"]
   script:
     # release the package
     - |

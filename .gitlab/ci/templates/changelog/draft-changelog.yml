@@ -40,7 +40,7 @@ include:
       git-cliff --version
       bash --version
 
-.default_rules:
+.draft_changelog_default_rules:
   rules:
     # Execute only if:
     # 1. It's a merge request
@@ -61,7 +61,7 @@ fetch_ci:
   stage: fetch
   image: "alpine:latest"
   extends:
-    - .default_rules
+    - .draft_changelog_default_rules
     - .fetch_ci
   before_script:
     # Install git, configure GitLab CI job token, and update CA certificates.
@@ -72,7 +72,7 @@ generate_changelog_draft:
   image: "alpine:latest"
   extends:
     - .default_before_script
-    - .default_rules
+    - .draft_changelog_default_rules
   needs: [fetch_ci]
   script:
     # Generate changelog draft using git-cliff.
