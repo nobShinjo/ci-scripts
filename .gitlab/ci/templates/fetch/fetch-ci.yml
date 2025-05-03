@@ -17,6 +17,7 @@
   variables:
     CA_STORE_DIR: "/usr/local/share/ca-certificates"
     CI_REPOSITORY: "https://gitlab.ubuntu.local/linesimulation/unity-npm/ci-scripts.git"
+    CI_BRANCH: "feature/add-ci-templates"
   script:
     # If `ci-scripts` directory exists, fetch the latest changes.
     # Otherwise, clone the repository.
@@ -29,7 +30,7 @@
         exit 0
       fi
       echo "📥 CI scripts not found. Cloning repository..."
-      git clone --depth=1 --branch main "$CI_REPOSITORY" tmp_ci
+      git clone --depth=1 --branch "$CI_BRANCH" "$CI_REPOSITORY" tmp_ci
       mkdir -p .gitlab
       cp -r tmp_ci/.gitlab/* .gitlab/
       rm -rf tmp_ci
