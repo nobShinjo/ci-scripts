@@ -25,7 +25,7 @@
       echo "🔄 Fetching CI scripts..."
       if [ -d ".gitlab" ]; then
         echo "🔄 CI scripts found. Fetching latest changes..."
-        cd .gitlab && git fetch --all && git reset --hard origin/main && cd ..
+        cd .gitlab && git fetch --all && git reset --hard origin/"$CI_BRANCH" && cd ..
         echo "✅ CI scripts updated successfully."
         exit 0
       fi
