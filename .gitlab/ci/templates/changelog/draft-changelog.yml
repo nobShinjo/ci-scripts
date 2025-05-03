@@ -87,6 +87,10 @@ generate_changelog_draft:
     - |
       echo "📥 Fetching origin/main..."
       git fetch origin main
+    # Ensure CHANGELOG_FILE exists for --prepend
+    - |
+      echo "🗂️ Ensuring $CHANGELOG_FILE exists..."
+      touch "$CHANGELOG_FILE"
     # Generate Unreleased draft changelog.
     # NOTE: --prepend is used to prepend the changelog draft to the existing CHANGELOG.md file.
     - |
