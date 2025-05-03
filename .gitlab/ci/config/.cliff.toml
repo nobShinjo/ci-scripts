@@ -33,7 +33,8 @@ body = """
 
   {% for commit in commits %}
     {%- set msg = commit.message | split(pat="\n") | first | trim -%}
-    - {{ commit.group }}{% if commit.scope %}({{ commit.scope }}){% endif %}: {{ msg | upper_first }} ({{ commit.id | truncate(length=7, end="") }})
+    {%- set hdr = commit.raw_message | split(pat="\n") | first | split(pat=":") | first | trim -%}
+    - {{ hdr }}: {{ msg | upper_first }} ({{ commit.id | truncate(length=7, end="") }})
   {% endfor -%}
 {% endfor %}
 ---
@@ -116,37 +117,37 @@ commit_preprocessors = []
 #  - style: formatting, missing semicolons, etc; no code change
 #  - test: adding or correcting tests
 commit_parsers = [
-  # Ignore rules
-  { message = "^Merge (branch|remote-tracking branch|pull request)", skip = true },
-  { message = "^Merge ![0-9]+", skip = true },
-  { message = "^bump:", skip = true },
-  { message = "(?i)^\\[?(?:skip ci|ci skip)\\]?$", skip = true },
+# Ignore rules
+{ message = "^Merge (branch|remote-tracking branch|pull request)", skip = true },
+{ message = "^Merge ![0-9]+", skip = true },
+{ message = "^bump:", skip = true },
+{ message = "(?i)^\\[?(?:skip ci|ci skip)\\]?$", skip = true },
 
-  # Keep a Changelog groups
-  ## Breaking changes
-  { message = "^\\w+(\\([^)]*\\))?!:", group = "Breaking" },
-  { body = "(?i)BREAKING[ -]CHANGE", group = "Breaking" },
+# Keep a Changelog groups
+## Breaking changes
+{ message = "^\\w+(\\([^)]*\\))?!:", group = "Breaking" },
+{ body = "(?i)BREAKING[ -]CHANGE", group = "Breaking" },
 
-  { message = "^feat", group = "Added" },
+{ message = "^feat", group = "Added" },
 
-  { message = "^style", group = "Changed" },
-  { message = "^refactor", group = "Changed" },
-  { message = "^perf", group = "Changed" },
-  { message = "^test", group = "Changed" },
-  { message = "^build", group = "Changed" },
-  { message = "^ci", group = "Changed" },
-  { message = "^chore", group = "Changed" },
+{ message = "^style", group = "Changed" },
+{ message = "^refactor", group = "Changed" },
+{ message = "^perf", group = "Changed" },
+{ message = "^test", group = "Changed" },
+{ message = "^build", group = "Changed" },
+{ message = "^ci", group = "Changed" },
+{ message = "^chore", group = "Changed" },
 
-  { body = "(?i)deprecat(ed|e)", group = "Deprecated" },
+{ body = "(?i)deprecat(ed|e)", group = "Deprecated" },
 
-  { message = "^fix", group = "Fixed" },
-  { message = "^docs", group = "Documentation" },
-  { message = "^revert", group = "Reverted" },
-  { message = "^security", group = "Security" },
-  { body = "(?i)\bsecurity\b", group = "Security" },
+{ message = "^fix", group = "Fixed" },
+{ message = "^docs", group = "Documentation" },
+{ message = "^revert", group = "Reverted" },
+{ message = "^security", group = "Security" },
+{ body = "(?i)\bsecurity\b", group = "Security" },
 
-  # Catch-all rule for any other commit messages.
-  { message = ".*", group = "Changed" },
+# Catch-all rule for any other commit messages.
+{ message = ".*", group = "Changed" },
 ]
 
 # Commits that are not matched by commit_parsers are filtered out.
@@ -167,10 +168,10 @@ sort_commits = "newest"
 # An array of link parsers for extracting external references,m and turning them int URLs, using regex.
 # See: https://git-cliff.org/docs/configuration/git#link_parsers
 link_parsers = [
-  # NOTE: The following link parsers are supported by GitLab:
-  # GitLab issues and merge requests
-  # { pattern = "#([0-9]+)", href = "https://gitlab.local/your-group/your-project/-/issues/{{ id }}" },
-  # { pattern = "!([0-9]+)", href = "https://gitlab.local/your-group/your-project/-/merge_requests/{{ id }}" },
-  # Git commit hashes
-  # { pattern = "([0-9a-f]{7,40})", href = "https://gitlab.local/your-group/your-project/-/commit/{{ id }}" },
+# NOTE: The following link parsers are supported by GitLab:
+# GitLab issues and merge requests
+# { pattern = "#([0-9]+)", href = "https://gitlab.local/your-group/your-project/-/issues/{{ id }}" },
+# { pattern = "!([0-9]+)", href = "https://gitlab.local/your-group/your-project/-/merge_requests/{{ id }}" },
+# Git commit hashes
+# { pattern = "([0-9a-f]{7,40})", href = "https://gitlab.local/your-group/your-project/-/commit/{{ id }}" },
 ]
