@@ -165,7 +165,7 @@ publish_upm_publish:
   extends:
     - .npm_publish_before_script
     - .npm_publish_default_rules
-  needs: ["update_changelog_for_npm:"]
+  needs: ["update_changelog_for_npm"]
   script:
     # release the package
     - |

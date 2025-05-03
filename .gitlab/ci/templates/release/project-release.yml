@@ -125,7 +125,7 @@ create_release:
   extends:
     - .project_release_before_script
     - .project_release_default_rules
-  needs: ["update_changelog_for_release:"]
+  needs: ["update_changelog_for_release"]
   script:
     - |
       VERSION=$(cat .next_version)
