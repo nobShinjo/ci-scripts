@@ -46,7 +46,7 @@ variables:
       jq --version
       curl --version | head -n1
       npm -v
-      bash --version
+      echo "bash version $(bash --version | head -n1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')"
 
 .npm_publish_default_rules:
   rules:

@@ -39,7 +39,7 @@ variables:
       apk add --no-cache bash yq > /dev/null 2>&1
       echo "📦 Tool Versions:"
       yq --version
-      bash --version
+      echo "bash version $(bash --version | head -n1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')"
 
 .project_release_default_rules:
   rules:

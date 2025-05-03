@@ -34,7 +34,7 @@ include:
       apk add --no-cache git-cliff bash > /dev/null 2>&1
       echo "📦 Tool Versions:"
       git-cliff --version
-      bash --version
+      echo "bash version $(bash --version | head -n1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')"
 
 .release_changelog_default_rules:
   rules:
