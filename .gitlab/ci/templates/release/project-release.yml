@@ -77,7 +77,7 @@ bump_version:
   script:
     - |
       echo "🔍 Checking for $VERSION_FILE"
-      bash +x .gitlab/ci/scripts/release/manage_version.sh $VERSION_FILE
+      bash .gitlab/ci/scripts/release/manage_version.sh $VERSION_FILE
       echo "✅ Bumped version to $(cat .next_version)"
   artifacts:
     name: "next_version"
@@ -139,7 +139,7 @@ create_release:
     # Generate release notes from CHANGELOG.md
     - |
       echo "📜 Generating release notes..."
-      bash =x .gitlab/ci/scripts/release/generate_release_note.sh "$CHANGELOG_FILE" ".release_note"
+      bash +x .gitlab/ci/scripts/release/generate_release_note.sh "$CHANGELOG_FILE" ".release_note"
       echo "📦 Creating release description..."
       echo "Release notes for v$VERSION" > .release_description
       printf "\n---\n" >> .release_description
