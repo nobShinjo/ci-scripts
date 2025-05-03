@@ -33,7 +33,7 @@ body = """
 
   {% for commit in commits %}
     {%- set msg = commit.message | split(pat="\n") | first | trim -%}
-    - {{ type }}{% if scope %}({{ scope }}){% endif %}: {{ msg | upper_first }} ({{ commit.id | truncate(length=7, end="") }})
+    - {{ commit.group }}{% if commit.scope %}({{ commit.scope }}){% endif %}: {{ msg | upper_first }} ({{ commit.id | truncate(length=7, end="") }})
   {% endfor -%}
 {% endfor %}
 ---
