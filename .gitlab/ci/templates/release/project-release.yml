@@ -49,7 +49,7 @@ variables:
     # This job will run manually for other branches.
     - when: manual
 
-fetch_ci:
+fetch_ci_for_release:
   # This job is responsible for fetching the CI scripts from the ci-scripts repository.
   # It clones the ci-scripts repository, copies the necessary files to the current directory.
   # This ensures that the latest CI scripts are always used.  stage: fetch
@@ -73,7 +73,7 @@ bump_version:
   extends:
     - .project_release_before_script
     - .project_release_default_rules
-  needs: ["fetch_ci"]
+  needs: ["fetch_ci_for_release"]
   script:
     - |
       echo "🔍 Checking for $VERSION_FILE"
