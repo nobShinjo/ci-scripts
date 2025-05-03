@@ -19,7 +19,7 @@
       apk add --no-cache git ca-certificates > /dev/null 2>&1
       echo "📦 Tool Versions:"
       git --version
-      ca-certificates --version
+      apk info ca-certificates
     # Configure GitLab CI job token
     - |
       echo "🔑 Configure GitLab CI job token..."
