@@ -64,7 +64,7 @@ generate_changelog_release:
   script:
     # Release changelog generation
     - |
-      echo "📝 Generating final changelog..."
+      echo "🔍 Checking for .cliff.toml..."
       if [ ! -f "$CLIFF_CONFIG_PATH" ]; then
         echo "❌ $CLIFF_CONFIG_PATH not found. Aborting."
         exit 1
