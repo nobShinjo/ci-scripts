@@ -42,9 +42,12 @@
       update-ca-certificates
     # Configure Git to use the CA certificate
     - |
-      echo "🔑 Configure Git user name, email"
+      echo "🔑 Configure Git author name: ${GIT_AUTHOR_NAME} and email: ${GIT_AUTHOR_EMAIL} ..."
       git config --global user.name "${GIT_AUTHOR_NAME}"
       git config --global user.email "${GIT_AUTHOR_EMAIL}"
       echo "🔑 Configure Git SSL CA info..."
       git config --global http.sslCAInfo "$CERT_PATH"
+      remote_repo_url=https://oauth2:${CI_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
+      echo "🔑 Configure Git remote URL ${remote_repo_url}..."
+      git remote set-url origin ${remote_repo_url}
       echo "✅ Successfully set up Git configuration."
