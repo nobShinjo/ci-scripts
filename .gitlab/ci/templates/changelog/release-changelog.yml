@@ -81,7 +81,7 @@ generate_changelog_release:
     # Check if CHANGELOG_FILE has changed
     - |
       echo "🔄 Checking for changes in $CHANGELOG_FILE..."
-      if git diff --quiet $CHANGELOG_FILE; then
+      if git diff --exit-code $CHANGELOG_FILE; then
         echo "ℹ️ No changes in $CHANGELOG_FILE, skipping commit."
         exit 0
       fi
