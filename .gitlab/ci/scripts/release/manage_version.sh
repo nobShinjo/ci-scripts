@@ -9,7 +9,7 @@
 # It also initializes VERSION.yml if it does not exist.
 
 # set -euo pipefail: Exit immediately if a command exits with a non-zero status.
-set -euo pipefail
+set -euxo pipefail
 
 # =========================
 # Parameters:

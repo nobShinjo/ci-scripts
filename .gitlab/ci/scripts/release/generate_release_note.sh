@@ -8,7 +8,7 @@
 #   The release note file is used for generating release notes for the project.
 
 # set -euo pipefail: Exit immediately if a command exits with a non-zero status.
-set -euo pipefail
+set -euxo pipefail
 
 # =========================
 # Parameters:

@@ -8,7 +8,7 @@
 #   It also ensures that the changelog file is in the correct format.
 
 # set -euo pipefail: Exit immediately if a command exits with a non-zero status.
-set -euo pipefail
+set -euxo pipefail
 
 # =========================
 # Parameters:

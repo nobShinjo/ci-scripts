@@ -123,7 +123,7 @@ publish_upm_check_version:
     # Run the version check and bump script
     - |
       echo "🔍 Checking version..."
-      bash .gitlab/ci/scripts/npm/manage_package_version.sh "$DIST_DIR/package.json" "$DIST_DIR" "$NPM_REGISTRY_URL" "$NPM_TOKEN"
+      bash +x .gitlab/ci/scripts/npm/manage_package_version.sh "$DIST_DIR/package.json" "$DIST_DIR" "$NPM_REGISTRY_URL" "$NPM_TOKEN"
       echo "✅ Version check and bump completed."
   artifacts:
     name: "next_version"
@@ -148,7 +148,7 @@ update_changelog_for_npm:
     - |
       VERSION=$(cat .next_version)
       echo "🚀 Updating changelog for version: $VERSION"
-      bash .gitlab/ci/scripts/changelog/update_for_release.sh "$VERSION" "CHANGELOG.md"
+      bash +x .gitlab/ci/scripts/changelog/update_for_release.sh "$VERSION" "CHANGELOG.md"
       cp CHANGELOG.md "$DIST_DIR/CHANGELOG.md"
     # Commit and push the updated changelog
     - |

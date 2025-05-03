@@ -11,7 +11,7 @@
 #   If the local version is newer than the published version, it updates the package.json with the local version.
 
 # set -euo pipefail: Exit immediately if a command exits with a non-zero status.
-set -euo pipefail
+set -euxo pipefail
 
 # =========================
 # Parameters:
