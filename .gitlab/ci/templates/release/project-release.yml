@@ -169,7 +169,7 @@ create_release:
       release-cli create \
       --name "v$VERSION" \
       --tag-name "v$VERSION" \
-      --description-file ./.release_description
+      --description ./.release_description
       echo "✅ Release created successfully for version v$VERSION"
   artifacts:
     name: "create_release"
