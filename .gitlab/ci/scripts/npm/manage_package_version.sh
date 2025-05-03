@@ -55,6 +55,45 @@ function update_package_json() {
     mv "${package_json}.tmp" "$package_json"
 }
 
+# Title: write_next_version
+#
+# Description:
+#   This function writes the next version to a file.
+# Arguments:
+#   $1: The next version (e.g., "1.0.0").
+# Returns:
+#   None
+# Usage:
+#   write_next_version "1.0.0"
+function write_next_version() {
+    local version=$1
+    if [[ -z "$version" ]]; then
+        echo "❌ Error: No version provided."
+        return 1
+    fi
+    echo "$version" >"$NEXT_VERSION_FILE"
+}
+
+# Title: validate_version
+#
+# Description:
+#   This function validates the version format.
+# Arguments:
+#  $1: The version to validate (e.g., "1.0.0").
+# Returns:
+#   0 if valid, 1 if invalid.
+# Usage:
+#   validate_version "1.0.0"
+#   validate_version "1.0"
+function validate_version() {
+    local version=$1
+    # Check if the version is in the format X.Y.Z
+    if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        return 1
+    fi
+    return 0
+}
+
 # =========================
 # Main script
 # =========================
@@ -65,6 +104,17 @@ PACKAGE_NAME=$(jq -r .name "$PACKAGE_JSON")
 CURRENT_VERSION=$(jq -r .version "$PACKAGE_JSON")
 BUMP_TYPE=$(jq -r '.versionBumpHint // "patch"' "$PACKAGE_JSON")
 echo "📦 $PACKAGE_NAME @ $CURRENT_VERSION ($BUMP_TYPE)"
+if [ -z "$CURRENT_VERSION" ]; then
+    echo "❌ Error: No version found in $PACKAGE_JSON."
+    exit 1
+fi
+
+# Validate the version format.
+if ! validate_version "$CURRENT_VERSION"; then
+    echo "❌ Error: Invalid version format in $PACKAGE_JSON."
+    echo "Version should be in the format following Semantic Versioning (e.g., 1.0.0)."
+    exit 1
+fi
 
 # Encode the package name for the GitLab registry URL.
 # GitLab requires @scope/package-name as %40scope%2Fpackage-name
@@ -95,7 +145,7 @@ elif [[ "$PUBLISHED_VERSION" == "$CURRENT_VERSION" ]]; then
         echo "❌ Failed to update package.json"
         exit 1
     }
-    echo "$NEXT_VERSION" >"$NEXT_VERSION_FILE"
+    write_next_version "$NEXT_VERSION"
     echo "📝 Adopted version: $NEXT_VERSION (bumped from $CURRENT_VERSION)"
 elif [[ "$(printf '%s\n' "$PUBLISHED_VERSION" "$CURRENT_VERSION" | sort -V | head -n1)" == "$CURRENT_VERSION" ]]; then
     # If the local version is older than the published version, abort the publish.
@@ -109,6 +159,6 @@ else
         echo "❌ Failed to update package.json"
         exit 1
     }
-    echo "$CURRENT_VERSION" >"$NEXT_VERSION_FILE"
+    write_next_version "$CURRENT_VERSION"
     echo "📝 Adopted version: $CURRENT_VERSION (ahead of registry)"
 fi
