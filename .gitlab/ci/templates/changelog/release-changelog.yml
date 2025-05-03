@@ -60,6 +60,7 @@ generate_changelog_release:
   extends:
     - .default_before_script
     - .default_rules
+  needs: [fetch_ci]
   script:
     # Release changelog generation
     - |
