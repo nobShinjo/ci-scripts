@@ -94,7 +94,7 @@ update_changelog:
   extends:
     - .default_before_script
     - .default_rules
-  needs: ["fetch_ci", "bump_version"]
+  needs: ["bump_version"]
   script:
     # Update CHANGELOG.md
     - |
@@ -125,7 +125,7 @@ create_release:
   extends:
     - .default_before_script
     - .default_rules
-  needs: ["fetch_ci", "bump_version", "update_changelog"]
+  needs: ["update_changelog"]
   script:
     - |
       VERSION=$(cat .next_version)
