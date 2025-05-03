@@ -171,8 +171,8 @@ update_changelog_for_npm:
     - |
       echo "📦 Committing changes..."
       git add $CHANGELOG_FILE
-      git commit -m "docs: update changelog for tag $VERSION"
-      git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME
+      git commit -m "docs(ci): update changelog for tag v$VERSION [ci skip]"
+      git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME --force-with-lease
       echo "🚀 Changelog updated successfully for version $VERSION"
   artifacts:
     name: "update_changelog_for_npm"
@@ -207,8 +207,8 @@ publish_upm_publish:
       else
         echo "💡 Committing bumped package.json..."
         git add "$PACKAGE_JSON_PATH"
-        git commit -m "chore(ci): bump version to $VERSION"
-        git push origin "$CI_COMMIT_BRANCH"
+        git commit -m "chore(ci): bump version to v$VERSION [ci skip]"
+        git push -o ci.skip origin "$CI_COMMIT_BRANCH" --force-with-lease
       fi
     # Tag the commit with the new version number
     - |

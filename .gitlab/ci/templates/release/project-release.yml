@@ -84,6 +84,7 @@ bump_version:
     name: "bump_version"
     paths:
       - .next_version
+      - $VERSION_FILE
     expire_in: 1 day
 
 update_changelog_for_release:
@@ -115,7 +116,7 @@ update_changelog_for_release:
     - |
       echo "📦 Committing changes..."
       git add $CHANGELOG_FILE
-      git commit -m "docs: update changelog for tag $VERSION [ci skip]"
+      git commit -m "docs(ci): update changelog for tag v$VERSION [ci skip]"
       git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME --force-with-lease
       echo "🚀 Changelog updated successfully for version $VERSION"
   artifacts:
@@ -123,6 +124,7 @@ update_changelog_for_release:
     paths:
       - .next_version
       - $CHANGELOG_FILE
+      - $VERSION_FILE
     expire_in: 1 day
 
 create_release:
@@ -148,6 +150,17 @@ create_release:
       if git rev-parse --verify "v$VERSION" >/dev/null 2>&1; then
         echo "🚫 Release v$VERSION already exists. Skipping release creation."
         exit 0
+      fi
+    # Commit and push the change to the VERSION.yml if it was modified
+    - |
+      echo " Checking if $VERSION_FILE was modified..."
+      if git diff --exit-code $VERSION_FILE; then
+        echo "ℹ️ No changes in $VERSION_FILE, skipping commit."
+      else
+        echo "📦 Committing bumped $VERSION_FILE..."
+        git add $VERSION_FILE
+        git commit -m "chore(ci): bump version to v$VERSION [ci skip]"
+        git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME --force-with-lease
       fi
     # Generate release notes from CHANGELOG.md
     - |
