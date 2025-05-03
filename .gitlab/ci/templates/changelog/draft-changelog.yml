@@ -45,7 +45,7 @@ include:
     # Execute only if:
     # 1. It's a merge request
     # 2. The source branch is feature/*
-    - if: '$CI_MERGE_REQUEST_IID && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^feature\//'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_REF_NAME =~ /^feature\//'
       when: on_success
     # Manual trigger for other branches.
     - when: manual
