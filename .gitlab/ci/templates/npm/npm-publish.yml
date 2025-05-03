@@ -119,6 +119,8 @@ publish_upm_check_version:
     - .npm_publish_before_script
     - .npm_publish_default_rules
   needs: ["publish_upm_prepare"]
+  depends:
+    - fetch_ci_for_npm
   script:
     # Run the version check and bump script
     - |
@@ -143,6 +145,8 @@ update_changelog_for_npm:
     - .npm_publish_before_script
     - .npm_publish_default_rules
   needs: ["publish_upm_check_version"]
+  depends:
+    - fetch_ci_for_npm
   script:
     # Update CHANGELOG.md
     - |
