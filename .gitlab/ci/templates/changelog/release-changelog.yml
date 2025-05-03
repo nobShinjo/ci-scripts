@@ -81,7 +81,6 @@ generate_changelog_release:
     # Check if CHANGELOG_FILE has changed
     - |
       echo "🔄 Checking for changes in $CHANGELOG_FILE..."
-      git add $CHANGELOG_FILE
       if git diff --quiet $CHANGELOG_FILE; then
         echo "ℹ️ No changes in $CHANGELOG_FILE, skipping commit."
         exit 0
@@ -89,6 +88,7 @@ generate_changelog_release:
     # Commit & push changes.
     - |
       echo "📦 Committing changes..."
+      git add $CHANGELOG_FILE
       git commit -m "docs: update changelog for release [ci skip]"
       git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME
       echo "📦 Pushed changes to $CI_COMMIT_REF_NAME."
