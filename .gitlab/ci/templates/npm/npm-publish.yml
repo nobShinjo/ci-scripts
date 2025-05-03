@@ -27,9 +27,9 @@ include:
   - .gitlab/ci/templates/git/git-config.yml
 
 variables:
-  PACKAGE_NAME: "my-package-name"
+  PACKAGE_NAME: "$CI_PACKAGE_NAME"
   PUBLISH_SOURCE_DIR: "Assets/${PACKAGE_NAME}"
-  PACKAGE_JSON_PATH: "${PUBLISH_SOURCE_DIR}/package.json"
+  PACKAGE_JSON_PATH: "Assets/${PACKAGE_NAME}/package.json"
   DIST_DIR: "dist"
   NPM_REGISTRY_URL: "https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/"
 
@@ -50,13 +50,15 @@ variables:
 
 .npm_publish_default_rules:
   rules:
-    # This job will run only on the default branch (e.g., main or master).
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: '$CI_PACKAGE_NAME == ""'
+      when: never
+    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+      exists:
+        - "${PACKAGE_JSON_PATH}"
       when: on_success
-    # This job will run manually for other branches.
-    - when: manual
-    # Skip this job unless all conditions above are satisfied.
-    - when: never
+    - exists:
+        - "${PACKAGE_JSON_PATH}"
+      when: manual
 
 fetch_ci_for_npm:
   # This job is responsible for fetching the CI scripts from the ci-scripts repository.

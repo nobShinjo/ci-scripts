@@ -45,14 +45,10 @@ include:
     # Execute only if:
     # 1. It's a merge request
     # 2. The source branch is feature/*
-    - if: "$CI_MERGE_REQUEST_IID"
-      when: on_success
-    - if: '$CI_COMMIT_BRANCH =~ /^feature\//'
+    - if: '$CI_MERGE_REQUEST_IID && $CI_COMMIT_BRANCH =~ /^feature\//'
       when: on_success
     # Manual trigger for other branches.
     - when: manual
-    # Skip this job unless all conditions above are satisfied.
-    - when: never
 
 fetch_ci_for_changelog:
   # This job is responsible for fetching the CI scripts from the ci-scripts repository.
