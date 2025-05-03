@@ -165,7 +165,13 @@ publish_upm_publish:
   extends:
     - .default_before_script
     - .default_rules
-  needs: ["fetch_ci", "update_changelog"]
+  needs:
+    [
+      "fetch_ci",
+      "publish_upm_prepare",
+      "publish_upm_check_version",
+      "update_changelog",
+    ]
   script:
     # release the package
     - |
