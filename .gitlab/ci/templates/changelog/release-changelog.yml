@@ -72,7 +72,7 @@ generate_changelog_release:
     # Fetch main branch for comparison
     - |
       echo "📥 Fetching origin/main..."
-      git fetch --unshallow origin main
+      git fetch origin main
     # Generate final changelog
     - |
       echo "📝 Generating final changelog..."

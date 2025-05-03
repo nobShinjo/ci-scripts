@@ -86,7 +86,7 @@ generate_changelog_draft:
     # Fetch main branch for comparison.
     - |
       echo "📥 Fetching origin/main..."
-      git fetch --unshallow origin main
+      git fetch origin main
     # Generate Unreleased draft changelog.
     # NOTE: --prepend is used to prepend the changelog draft to the existing CHANGELOG.md file.
     - |
