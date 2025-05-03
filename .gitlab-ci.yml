@@ -22,3 +22,14 @@ include:
   - project: "LineSimulation/unity-npm/ci-scripts"
     ref: "feature/add-ci-templates"
     file: "/.gitlab/ci/templates/changelog/release-changelog.yml"
+
+workflow:
+  rules:
+    # When a merge request is created or updated, run the pipeline.
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: always
+    # When pushing to the default branch, run the pipeline.
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: always
+    # Otherwise, do not run the pipeline.
+    - when: never
