@@ -84,11 +84,11 @@ GitLab の **Settings > CI/CD > Variables** に以下を登録してください
 
 ```yaml
 version: 1.2.3
-versionBumpHint: patch # patch, minor, major のいずれかを指定
+version_bump_hint: patch # patch, minor, major のいずれかを指定
 ```
 
 >[!NOTE]:
-> `versionBumpHint` を指定しない場合、デフォルトで `patch` が使用されます。
+> `version_bump_hint` を指定しない場合、デフォルトで `patch` が使用されます。
 
 ---
 
