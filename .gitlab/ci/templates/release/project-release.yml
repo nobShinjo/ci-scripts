@@ -48,6 +48,8 @@ variables:
       when: on_success
     # This job will run manually for other branches.
     - when: manual
+    # Skip this job unless all conditions above are satisfied.
+    - when: never
 
 fetch_ci_for_release:
   # This job is responsible for fetching the CI scripts from the ci-scripts repository.
