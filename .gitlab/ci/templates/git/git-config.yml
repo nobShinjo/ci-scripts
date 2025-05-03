@@ -16,7 +16,7 @@
     - |
       echo "⚙️ Setting up Git configuration..."
       echo "📦 Install necessary tools..."
-      apk add --no-cache git ca-certificates
+      apk add --no-cache git ca-certificates > /dev/null 2>&1
       echo "📦 Tool Versions:"
       git --version
       apk info ca-certificates
