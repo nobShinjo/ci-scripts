@@ -34,6 +34,8 @@ variables:
   NPM_REGISTRY_URL: "https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/"
 
 .default_before_script:
+  variables:
+    - !reference [.git-config, variables]
   before_script:
     # Install git, configure GitLab CI job token, and update CA certificates.
     - !reference [.git-config, before_script]

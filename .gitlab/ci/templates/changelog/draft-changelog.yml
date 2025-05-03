@@ -25,9 +25,12 @@ variables:
   GIT_DEPTH: 0
 
 include:
+  - .gitlab/ci/templates/fetch/fetch-ci.yml
   - .gitlab/ci/templates/git/git-config.yml
 
 .default_before_script:
+  variables:
+    - !reference [.git-config, variables]
   before_script:
     # Install git, configure GitLab CI job token, and update CA certificates.
     - !reference [.git-config, before_script]
@@ -70,6 +73,7 @@ generate_changelog_draft:
   extends:
     - .default_before_script
     - .default_rules
+  needs: [fetch_ci]
   script:
     # Generate changelog draft using git-cliff.
     - |
