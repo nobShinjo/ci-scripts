@@ -63,6 +63,7 @@ fetch_ci_for_release:
     # Manual trigger only for the default branch.
     - if: "$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH"
       when: manual
+      allow_failure: true
 
 bump_version:
   # This stage is responsible for bumping the version of the project.
@@ -96,6 +97,7 @@ bump_version:
     # Manual trigger only for the default branch.
     - if: "$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH"
       when: manual
+      allow_failure: true
 
 update_changelog_for_release:
   # This stage is responsible for updating the changelog.
@@ -145,6 +147,7 @@ update_changelog_for_release:
     # Manual trigger only for the default branch.
     - if: "$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH"
       when: manual
+      allow_failure: true
 
 create_release:
   # This stage is responsible for creating a release on GitLab.
@@ -219,3 +222,4 @@ create_release:
     # Manual trigger only for the default branch.
     - if: "$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH"
       when: manual
+      allow_failure: true

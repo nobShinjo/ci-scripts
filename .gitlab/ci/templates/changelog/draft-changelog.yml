@@ -57,7 +57,7 @@ fetch_ci_for_changelog_for_draft:
       when: always
     # Manual trigger for other branches.
     - when: manual
-      allow_failure: false
+      allow_failure: true
 
 generate_feature_branch_changelog_draft:
   stage: draft
@@ -119,4 +119,4 @@ generate_feature_branch_changelog_draft:
       when: on_success
     # Manual trigger for other branches.
     - when: manual
-      allow_failure: false
+      allow_failure: true

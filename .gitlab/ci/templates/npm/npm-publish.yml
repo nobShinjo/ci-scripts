@@ -77,7 +77,7 @@ fetch_ci_for_npm:
       exists:
         - "${PACKAGE_JSON_PATH}"
       when: manual
-      allow_failure: false
+      allow_failure: true
 
 publish_upm_prepare:
   # This stage is preparing the package for publishing.
@@ -138,7 +138,7 @@ publish_upm_prepare:
       exists:
         - "${PACKAGE_JSON_PATH}"
       when: manual
-      allow_failure: false
+      allow_failure: true
 
 publish_upm_check_version:
   # This stage checks the version of the package to be published.
@@ -182,7 +182,7 @@ publish_upm_check_version:
       exists:
         - "${PACKAGE_JSON_PATH}"
       when: manual
-      allow_failure: false
+      allow_failure: true
 
 update_changelog_for_npm:
   # This stage updates the changelog for the package.
@@ -242,7 +242,7 @@ update_changelog_for_npm:
       exists:
         - "${PACKAGE_JSON_PATH}"
       when: manual
-      allow_failure: false
+      allow_failure: true
 
 publish_upm_publish:
   # This stage publishes the package to the GitLab npm package registry.
@@ -323,4 +323,4 @@ publish_upm_publish:
       exists:
         - "${PACKAGE_JSON_PATH}"
       when: manual
-      allow_failure: false
+      allow_failure: true
