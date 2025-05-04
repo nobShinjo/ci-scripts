@@ -204,20 +204,25 @@ update_changelog_for_npm:
       echo "🚀 Updating changelog for version: $VERSION"
       bash +x .gitlab/ci/scripts/changelog/update_for_release.sh "$VERSION" "$CHANGELOG_FILE"
       cp $CHANGELOG_FILE "$DIST_DIR/$CHANGELOG_FILE"
-    # Check for changes in the CHANGELOG.md.
+    # Check for changes in the CHANGELOG.md, and commit if there are any.
     - |
-      echo "🔄 Checking for changes in $CHANGELOG_FILE..."
-      if git diff --exit-code $CHANGELOG_FILE; then
+      echo "🔍 Checking for changes in $CHANGELOG_FILE..."
+      if [ -n "$(git ls-files --others --exclude-standard -- "$CHANGELOG_FILE")" ]; then
+        echo "🆕 $CHANGELOG_FILE is a new file. Committing..."
+        git add $CHANGELOG_FILE
+        git commit -m "docs(ci): add new changelog for tag v$VERSION [ci skip]"
+        git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME
+        echo "🚀 Changelog committed successfully (new file)"
+      elif ! git diff --quiet "$CHANGELOG_FILE"; then
+        echo "✏️ $CHANGELOG_FILE was modified. Committing..."
+        git add $CHANGELOG_FILE
+        git commit -m "docs(ci): update changelog for tag v$VERSION [ci skip]"
+        git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME
+        echo "🚀 Changelog updated successfully for version $VERSION"
+      else
         echo "ℹ️ No changes in $CHANGELOG_FILE, skipping commit."
         exit 0
       fi
-    # Commit and push the updated changelog
-    - |
-      echo "📦 Committing changes..."
-      git add $CHANGELOG_FILE
-      git commit -m "docs(ci): update changelog for tag v$VERSION [ci skip]"
-      git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME
-      echo "🚀 Changelog updated successfully for version $VERSION"
   artifacts:
     name: "update_changelog_for_npm"
     paths:
@@ -269,7 +274,7 @@ publish_upm_publish:
     # Commit and push the changes to package.json if it was modified
     - |
       echo "🔍 Checking if package.json was modified..."
-      if git diff --exit-code "$PACKAGE_JSON_PATH"; then
+      if git diff --quiet "$PACKAGE_JSON_PATH"; then
         echo "✅ No changes to package.json"
       else
         echo "💡 Committing bumped package.json..."

@@ -112,20 +112,25 @@ update_changelog_for_release:
       VERSION=$(cat .next_version)
       echo "🚀 Updating changelog for version: $VERSION"
       bash +x .gitlab/ci/scripts/changelog/update_for_release.sh "$VERSION" "$CHANGELOG_FILE"
-    # Check for changes in the CHANGELOG.md.
+    # Check for changes in the CHANGELOG.md, and commit if there are any.
     - |
-      echo "🔄 Checking for changes in $CHANGELOG_FILE..."
-      if git diff --exit-code $CHANGELOG_FILE; then
+      echo "🔍 Checking for changes in $CHANGELOG_FILE..."
+      if [ -n "$(git ls-files --others --exclude-standard -- "$CHANGELOG_FILE")" ]; then
+        echo "🆕 $CHANGELOG_FILE is a new file. Committing..."
+        git add $CHANGELOG_FILE
+        git commit -m "docs(ci): add new changelog for tag v$VERSION [ci skip]"
+        git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME
+        echo "🚀 Changelog committed successfully (new file)"
+      elif ! git diff --quiet "$CHANGELOG_FILE"; then
+        echo "✏️ $CHANGELOG_FILE was modified. Committing..."
+        git add $CHANGELOG_FILE
+        git commit -m "docs(ci): update changelog for tag v$VERSION [ci skip]"
+        git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME
+        echo "🚀 Changelog updated successfully for version $VERSION"
+      else
         echo "ℹ️ No changes in $CHANGELOG_FILE, skipping commit."
         exit 0
       fi
-    # Commit and push the updated changelog
-    - |
-      echo "📦 Committing changes..."
-      git add $CHANGELOG_FILE
-      git commit -m "docs(ci): update changelog for tag v$VERSION [ci skip]"
-      git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME
-      echo "🚀 Changelog updated successfully for version $VERSION"
   artifacts:
     name: "update_changelog_for_release"
     paths:
@@ -168,21 +173,26 @@ create_release:
       fi
     # Commit and push the change to the VERSION.yml if it was modified
     - |
-      echo " Checking if $VERSION_FILE was modified..."
-      cat $VERSION_FILE
-      if git diff --exit-code $VERSION_FILE; then
-        echo "ℹ️ No changes in $VERSION_FILE, skipping commit."
-      else
-        echo "📦 Committing bumped $VERSION_FILE..."
+      echo "🔍 Checking if $VERSION_FILE was added or modified..."
+      if [ -n "$(git ls-files --others --exclude-standard -- "$VERSION_FILE")" ]; then
+        echo "🆕 $VERSION_FILE is a new file. Adding..."
+        git add $VERSION_FILE
+        git commit -m "chore(ci): add new VERSION.yml [ci skip]"
+        git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME
+      elif ! git diff --quiet $VERSION_FILE; then
+        echo "✏️ $VERSION_FILE was modified. Committing..."
         git add $VERSION_FILE
         git commit -m "chore(ci): bump version to v$VERSION [ci skip]"
         git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME
+      else
+        echo "ℹ️ No changes in $VERSION_FILE. Skipping commit."
       fi
+
     # Generate release notes from CHANGELOG.md
     - |
       echo "📜 Generating release notes..."
       bash +x .gitlab/ci/scripts/release/generate_release_note.sh "$CHANGELOG_FILE" ".release_note"
-      echo "📦 Creating release description..."
+      echo "✏️ Creating release description..."
       echo "Release notes for v$VERSION" > .release_description
       printf "\n---\n" >> .release_description
       cat .release_note >> .release_description
