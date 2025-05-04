@@ -172,7 +172,7 @@ if [[ "$CURRENT_VERSION" == "$TAG_VERSION" ]]; then
     # If the local version is already released with the same version,
     # bump the version based on the specified type.
     echo "🔁 Already released. Bumping $BUMP_TYPE..."
-    NEXT_VERSION=$(update_version "$current_version" "$bump_type")
+    NEXT_VERSION=$(update_version "$CURRENT_VERSION" "$bump_type")
     update_version_in_yaml "$NEXT_VERSION" "$VERSION_FILE"
     write_next_version "$NEXT_VERSION"
     echo "📝 Adopted version: $NEXT_VERSION (based on current: $TAG_VERSION)"
