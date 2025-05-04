@@ -63,10 +63,11 @@ variables:
         - "${PACKAGE_JSON_PATH}"
       when: on_success
     # Manual trigger only for the default branch.
-    - if: "$CI_COMMIT_BRANCH = $CI_DEFAULT_BRANCH"
+    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
       exists:
         - "${PACKAGE_JSON_PATH}"
       when: manual
+      allow_failure: false
 
 fetch_ci_for_npm:
   # This job is responsible for fetching the CI scripts from the ci-scripts repository.
@@ -97,6 +98,12 @@ publish_upm_prepare:
     - .npm_publish_default_rules
   needs: [fetch_ci_for_npm]
   script:
+    # Check if PACKAGE_NAME is set
+    - |
+      if [ -z "$PACKAGE_NAME" ]; then
+        echo "❌ PACKAGE_NAME is not set. Aborting."
+        exit 1
+      fi
     # Check if the package.json file exists in the specified path
     - echo "🔍 Checking for package.json..."
     - |
@@ -206,6 +213,12 @@ publish_upm_publish:
     - |
       VERSION=$(cat .next_version)
       echo "🚀 Publishing version: $VERSION"
+    # Check if the release already exists
+    - |
+      if git rev-parse --verify "v$VERSION" >/dev/null 2>&1; then
+        echo "🚫 Release v$VERSION already exists. Skipping release creation."
+        exit 0
+      fi
     # Commit and push the changes to package.json if it was modified
     - |
       echo "🔍 Checking if package.json was modified..."
@@ -217,7 +230,7 @@ publish_upm_publish:
         git commit -m "chore(ci): bump version to v$VERSION [ci skip]"
         git push -o ci.skip origin "$CI_COMMIT_BRANCH" --force-with-lease
       fi
-    # Tag the commit with the new version number
+    # Tags the current HEAD with the new version number.
     - |
       echo "🏷️ Tagging: v$VERSION"
       git tag "v$VERSION"
@@ -225,20 +238,19 @@ publish_upm_publish:
     # Create .npmrc file for authentication with the GitLab npm registry
     - |
       echo "🔑 Creating .npmrc file..."
-      cat "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${NPM_TOKEN}" > "$DIST_DIR/.npmrc"
-    # Check to authenticate with the GitLab npm registry
-    - |
+      NPMRC_PATH="$DIST_DIR/.npmrc"
+      trap "rm -f $NPMRC_PATH" EXIT
+      cat "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${NPM_TOKEN}" > "$NPMRC_PATH"
+
       echo "🔑 Authenticating with GitLab npm registry..."
       cd "$DIST_DIR"
-      npm whoami --registry="$NPM_REGISTRY_URL" --userconfig ".npmrc" || {
-        echo "❌ Authentication failed";
-        exit 1;
-      }
+      if ! npm whoami --registry="$NPM_REGISTRY_URL" --userconfig "$NPMRC_PATH"; then
+        echo "❌ NPM authentication failed. Check NPM_TOKEN and project permissions."
+        exit 1
+      fi
+
       echo "📦 Publishing to GitLab npm registry..."
-      npm publish --access=public --registry="$NPM_REGISTRY_URL" --userconfig ".npmrc"
-      echo "🧹 Cleaning up..."
-      rm -f .npmrc
-      cd ..
+      npm publish --registry="$NPM_REGISTRY_URL" --userconfig "$NPMRC_PATH"
       echo "✅ Published successfully!"
   artifacts:
     name: "publish_upm_publish"
