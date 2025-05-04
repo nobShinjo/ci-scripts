@@ -44,7 +44,7 @@ include:
   rules:
     # Execute only if the pipeline is triggered by a merge request.
     - if: >
-        $CI_MERGE_REQUEST_IID &&
+        $CI_PIPELINE_SOURCE == "merge_request_event" &&
         $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "$CI_DEFAULT_BRANCH" &&
         $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^feature\//
       when: on_success
@@ -60,16 +60,10 @@ fetch_ci_for_changelog:
   image: "alpine:latest"
   extends:
     - .draft_changelog_default_rules
-    # - .fetch_ci
+    - .fetch_ci
   before_script:
     # Install git, configure GitLab CI job token, and update CA certificates.
     - !reference [.git-config, before_script]
-  script:
-    # Print environment variables for debugging.
-    - echo "CI_MERGE_REQUEST_IID=$CI_MERGE_REQUEST_IID"
-    - echo "CI_MERGE_REQUEST_TARGET_BRANCH_NAME=$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
-    - echo "CI_MERGE_REQUEST_SOURCE_BRANCH_NAME=$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"
-    - echo "CI_DEFAULT_BRANCH=$CI_DEFAULT_BRANCH"
 
 generate_feature_branch_changelog_draft:
   stage: draft
@@ -77,7 +71,9 @@ generate_feature_branch_changelog_draft:
   extends:
     - .default_before_script
     - .draft_changelog_default_rules
-  needs: [fetch_ci_for_changelog]
+  needs:
+    - job: fetch_ci_for_changelog
+      optional: true
   script:
     # Generate changelog draft using git-cliff.
     - |
