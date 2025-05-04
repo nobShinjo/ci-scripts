@@ -56,7 +56,8 @@ fetch_ci_for_changelog_for_draft:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       when: always
     # Manual trigger for other branches.
-    - when: manual
+    - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
+      when: manual
       allow_failure: true
 
 generate_feature_branch_changelog_draft:
@@ -122,5 +123,6 @@ generate_feature_branch_changelog_draft:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       when: on_success
     # Manual trigger for other branches.
-    - when: manual
+    - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
+      when: manual
       allow_failure: true

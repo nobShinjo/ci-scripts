@@ -49,7 +49,8 @@ fetch_ci_for_changelog_for_release:
     - !reference [.git-config, before_script]
   rules:
     # Manual trigger for other branches.
-    - when: manual
+    - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
+      when: manual
       allow_failure: true
 
 generate_changelog_release:
@@ -102,5 +103,6 @@ generate_changelog_release:
     expire_in: 1 week
   rules:
     # Manual trigger for other branches.
-    - when: manual
+    - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
+      when: manual
       allow_failure: true
