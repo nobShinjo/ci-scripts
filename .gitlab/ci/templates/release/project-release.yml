@@ -58,10 +58,10 @@ fetch_ci_for_release:
     # and the package.json file exists in the specified path.
     - if: >
         $CI_PIPELINE_SOURCE == "push" &&
-        $CI_COMMIT_BRANCH == "$CI_DEFAULT_BRANCH"
+        $CI_COMMIT_REF_NAME == "$CI_DEFAULT_BRANCH"
       when: always
     # Manual trigger only for the default branch.
-    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+    - if: "$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH"
       when: manual
 
 bump_version:
@@ -91,10 +91,10 @@ bump_version:
     # and the package.json file exists in the specified path.
     - if: >
         $CI_PIPELINE_SOURCE == "push" &&
-        $CI_COMMIT_BRANCH == "$CI_DEFAULT_BRANCH"
+        $CI_COMMIT_REF_NAME == "$CI_DEFAULT_BRANCH"
       when: on_success
     # Manual trigger only for the default branch.
-    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+    - if: "$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH"
       when: manual
 
 update_changelog_for_release:
@@ -140,10 +140,10 @@ update_changelog_for_release:
     # and the package.json file exists in the specified path.
     - if: >
         $CI_PIPELINE_SOURCE == "push" &&
-        $CI_COMMIT_BRANCH == "$CI_DEFAULT_BRANCH"
+        $CI_COMMIT_REF_NAME == "$CI_DEFAULT_BRANCH"
       when: on_success
     # Manual trigger only for the default branch.
-    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+    - if: "$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH"
       when: manual
 
 create_release:
@@ -214,8 +214,8 @@ create_release:
     # and the package.json file exists in the specified path.
     - if: >
         $CI_PIPELINE_SOURCE == "push" &&
-        $CI_COMMIT_BRANCH == "$CI_DEFAULT_BRANCH"
+        $CI_COMMIT_REF_NAME == "$CI_DEFAULT_BRANCH"
       when: on_success
     # Manual trigger only for the default branch.
-    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+    - if: "$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH"
       when: manual
