@@ -46,7 +46,6 @@ variables:
       echo "📦 Tool Versions:"
       jq --version
       curl --version | head -n1
-      npm -v
       echo "bash version $(bash --version | head -n1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')"
 
 fetch_ci_for_npm:
@@ -261,6 +260,10 @@ publish_upm_publish:
     - .npm_publish_before_script
   needs: ["update_changelog_for_npm"]
   script:
+    # Install necessary tools
+    - |
+      echo "📦 Tool Versions:"
+      npm -v
     # release the package
     - |
       VERSION=$(cat .next_version)
