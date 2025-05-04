@@ -194,8 +194,9 @@ update_changelog_for_npm:
   extends:
     - .npm_publish_before_script
   needs:
-    - publish_upm_check_version
     - fetch_ci_for_npm
+    - publish_upm_prepare
+    - publish_upm_check_version
   script:
     # Update CHANGELOG.md
     - |
