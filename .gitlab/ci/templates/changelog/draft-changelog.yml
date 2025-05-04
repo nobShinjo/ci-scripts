@@ -49,7 +49,20 @@ include:
         $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^feature\//
       when: on_success
     # Manual trigger for other branches.
-    - when: never
+    - when: manual
+      allow_failure: false
+
+echo_environment:
+  stage: fetch
+  image: "alpine:latest"
+  script:
+    # Print environment variables for debugging.
+    - echo "CI_MERGE_REQUEST_IID=$CI_MERGE_REQUEST_IID"
+    - echo "CI_MERGE_REQUEST_TARGET_BRANCH_NAME=$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
+    - echo "CI_MERGE_REQUEST_SOURCE_BRANCH_NAME=$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"
+    - echo "CI_DEFAULT_BRANCH=$CI_DEFAULT_BRANCH"
+  rules:
+    - when: manual
       allow_failure: false
 
 fetch_ci_for_changelog:
