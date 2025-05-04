@@ -125,7 +125,13 @@ PACKAGE_INFO_URL="${REGISTRY_URL%-*}/npm/${ENCODED_NAME}"
 
 # Get the published version from the GitLab registry.
 echo "🌐 Registry: $PACKAGE_INFO_URL"
-PUBLISHED_VERSION=$(curl -s --header "PRIVATE-TOKEN: ${NPM_TOKEN}" "$PACKAGE_INFO_URL" | jq -r '.versions | keys | last')
+RESPONSE=$(curl -s --header "PRIVATE-TOKEN: ${NPM_TOKEN}" "$PACKAGE_INFO_URL")
+if echo "$RESPONSE" | jq -e '.versions' >/dev/null 2>&1; then
+    PUBLISHED_VERSION=$(echo "$RESPONSE" | jq -r '.versions | keys | last')
+else
+    echo "⚠️ Version information not found in the response: $RESPONSE"
+    PUBLISHED_VERSION=""
+fi
 
 # Adopt the version based on the published version and the local version.
 if [[ -z "$PUBLISHED_VERSION" ]]; then
