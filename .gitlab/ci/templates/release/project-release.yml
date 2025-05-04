@@ -42,18 +42,6 @@ variables:
       yq --version
       echo "bash version $(bash --version | head -n1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')"
 
-.project_release_default_rules:
-  rules:
-    # Execute only if the pipeline is triggered by a push to the default branch,
-    # and the package.json file exists in the specified path.
-    - if: >
-        $CI_PIPELINE_SOURCE == "push" &&
-        $CI_COMMIT_BRANCH == "$CI_DEFAULT_BRANCH"
-      when: on_success
-    # Manual trigger only for the default branch.
-    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
-      when: manual
-
 fetch_ci_for_release:
   # This job is responsible for fetching the CI scripts from the ci-scripts repository.
   # It clones the ci-scripts repository, copies the necessary files to the current directory.
@@ -62,10 +50,19 @@ fetch_ci_for_release:
   image: "alpine:latest"
   extends:
     - .fetch_ci
-    - .project_release_default_rules
   before_script:
     # Install git, configure GitLab CI job token, and update CA certificates.
     - !reference [.git-config, before_script]
+  rules:
+    # Execute only if the pipeline is triggered by a push to the default branch,
+    # and the package.json file exists in the specified path.
+    - if: >
+        $CI_PIPELINE_SOURCE == "push" &&
+        $CI_COMMIT_BRANCH == "$CI_DEFAULT_BRANCH"
+      when: always
+    # Manual trigger only for the default branch.
+    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+      when: manual
 
 bump_version:
   # This stage is responsible for bumping the version of the project.
@@ -77,7 +74,6 @@ bump_version:
   image: "alpine:latest"
   extends:
     - .project_release_before_script
-    - .project_release_default_rules
   needs: ["fetch_ci_for_release"]
   script:
     - |
@@ -90,6 +86,16 @@ bump_version:
       - .next_version
       - $VERSION_FILE
     expire_in: 1 day
+  rules:
+    # Execute only if the pipeline is triggered by a push to the default branch,
+    # and the package.json file exists in the specified path.
+    - if: >
+        $CI_PIPELINE_SOURCE == "push" &&
+        $CI_COMMIT_BRANCH == "$CI_DEFAULT_BRANCH"
+      when: on_success
+    # Manual trigger only for the default branch.
+    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+      when: manual
 
 update_changelog_for_release:
   # This stage is responsible for updating the changelog.
@@ -99,7 +105,6 @@ update_changelog_for_release:
   image: "alpine:latest"
   extends:
     - .project_release_before_script
-    - .project_release_default_rules
   needs:
     - bump_version
     - fetch_ci_for_release
@@ -130,6 +135,16 @@ update_changelog_for_release:
       - $CHANGELOG_FILE
       - $VERSION_FILE
     expire_in: 1 day
+  rules:
+    # Execute only if the pipeline is triggered by a push to the default branch,
+    # and the package.json file exists in the specified path.
+    - if: >
+        $CI_PIPELINE_SOURCE == "push" &&
+        $CI_COMMIT_BRANCH == "$CI_DEFAULT_BRANCH"
+      when: on_success
+    # Manual trigger only for the default branch.
+    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+      when: manual
 
 create_release:
   # This stage is responsible for creating a release on GitLab.
@@ -141,7 +156,6 @@ create_release:
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   extends:
     - .project_release_before_script
-    - .project_release_default_rules
   needs:
     - update_changelog_for_release
     - fetch_ci_for_release
@@ -195,3 +209,13 @@ create_release:
       - .release_note
       - $CHANGELOG_FILE
     expire_in: 1 day
+  rules:
+    # Execute only if the pipeline is triggered by a push to the default branch,
+    # and the package.json file exists in the specified path.
+    - if: >
+        $CI_PIPELINE_SOURCE == "push" &&
+        $CI_COMMIT_BRANCH == "$CI_DEFAULT_BRANCH"
+      when: on_success
+    # Manual trigger only for the default branch.
+    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+      when: manual

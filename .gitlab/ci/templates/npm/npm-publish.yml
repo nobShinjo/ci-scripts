@@ -50,6 +50,18 @@ variables:
       echo "bash version $(bash --version | head -n1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')"
 
 .npm_publish_default_rules:
+
+fetch_ci_for_npm:
+  # This job is responsible for fetching the CI scripts from the ci-scripts repository.
+  # It clones the ci-scripts repository, copies the necessary files to the current directory.
+  # This ensures that the latest CI scripts are always used.  stage: fetch
+  stage: fetch
+  image: "alpine:latest"
+  extends:
+    - .fetch_ci
+  before_script:
+    # Install git, configure GitLab CI job token, and update CA certificates.
+    - !reference [.git-config, before_script]
   rules:
     # No need to run if the package name is not set.
     - if: '$CI_PACKAGE_NAME == ""'
@@ -61,26 +73,13 @@ variables:
         $CI_COMMIT_BRANCH == "$CI_DEFAULT_BRANCH"
       exists:
         - "${PACKAGE_JSON_PATH}"
-      when: on_success
+      when: always
     # Manual trigger only for the default branch.
     - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
       exists:
         - "${PACKAGE_JSON_PATH}"
       when: manual
       allow_failure: false
-
-fetch_ci_for_npm:
-  # This job is responsible for fetching the CI scripts from the ci-scripts repository.
-  # It clones the ci-scripts repository, copies the necessary files to the current directory.
-  # This ensures that the latest CI scripts are always used.  stage: fetch
-  stage: fetch
-  image: "alpine:latest"
-  extends:
-    - .fetch_ci
-    - .npm_publish_default_rules
-  before_script:
-    # Install git, configure GitLab CI job token, and update CA certificates.
-    - !reference [.git-config, before_script]
 
 publish_upm_prepare:
   # This stage is preparing the package for publishing.
@@ -95,7 +94,6 @@ publish_upm_prepare:
   image: "alpine:latest"
   extends:
     - .npm_publish_before_script
-    - .npm_publish_default_rules
   needs: [fetch_ci_for_npm]
   script:
     # Check if PACKAGE_NAME is set
@@ -125,6 +123,24 @@ publish_upm_prepare:
     paths:
       - "$DIST_DIR"
     expire_in: 1 day
+  rules:
+    # No need to run if the package name is not set.
+    - if: '$CI_PACKAGE_NAME == ""'
+      when: never
+    # Execute only if the pipeline is triggered by a push to the default branch,
+    # and the package.json file exists in the specified path.
+    - if: >
+        $CI_PIPELINE_SOURCE == "push" &&
+        $CI_COMMIT_BRANCH == "$CI_DEFAULT_BRANCH"
+      exists:
+        - "${PACKAGE_JSON_PATH}"
+      when: on_success
+    # Manual trigger only for the default branch.
+    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+      exists:
+        - "${PACKAGE_JSON_PATH}"
+      when: manual
+      allow_failure: false
 
 publish_upm_check_version:
   # This stage checks the version of the package to be published.
@@ -137,7 +153,6 @@ publish_upm_check_version:
   image: "alpine:latest"
   extends:
     - .npm_publish_before_script
-    - .npm_publish_default_rules
   needs:
     - publish_upm_prepare
     - fetch_ci_for_npm
@@ -152,6 +167,24 @@ publish_upm_check_version:
     paths:
       - .next_version
     expire_in: 1 day
+  rules:
+    # No need to run if the package name is not set.
+    - if: '$CI_PACKAGE_NAME == ""'
+      when: never
+    # Execute only if the pipeline is triggered by a push to the default branch,
+    # and the package.json file exists in the specified path.
+    - if: >
+        $CI_PIPELINE_SOURCE == "push" &&
+        $CI_COMMIT_BRANCH == "$CI_DEFAULT_BRANCH"
+      exists:
+        - "${PACKAGE_JSON_PATH}"
+      when: on_success
+    # Manual trigger only for the default branch.
+    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+      exists:
+        - "${PACKAGE_JSON_PATH}"
+      when: manual
+      allow_failure: false
 
 update_changelog_for_npm:
   # This stage updates the changelog for the package.
@@ -163,7 +196,6 @@ update_changelog_for_npm:
   image: "alpine:latest"
   extends:
     - .npm_publish_before_script
-    - .npm_publish_default_rules
   needs:
     - publish_upm_check_version
     - fetch_ci_for_npm
@@ -195,6 +227,24 @@ update_changelog_for_npm:
       - $CHANGELOG_FILE
       - $DIST_DIR
     expire_in: 1 day
+  rules:
+    # No need to run if the package name is not set.
+    - if: '$CI_PACKAGE_NAME == ""'
+      when: never
+    # Execute only if the pipeline is triggered by a push to the default branch,
+    # and the package.json file exists in the specified path.
+    - if: >
+        $CI_PIPELINE_SOURCE == "push" &&
+        $CI_COMMIT_BRANCH == "$CI_DEFAULT_BRANCH"
+      exists:
+        - "${PACKAGE_JSON_PATH}"
+      when: on_success
+    # Manual trigger only for the default branch.
+    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+      exists:
+        - "${PACKAGE_JSON_PATH}"
+      when: manual
+      allow_failure: false
 
 publish_upm_publish:
   # This stage publishes the package to the GitLab npm package registry.
@@ -206,7 +256,6 @@ publish_upm_publish:
   image: "node:18-alpine"
   extends:
     - .npm_publish_before_script
-    - .npm_publish_default_rules
   needs: ["update_changelog_for_npm"]
   script:
     # release the package
@@ -259,3 +308,21 @@ publish_upm_publish:
       - $CHANGELOG_FILE
       - $DIST_DIR
     expire_in: 1 day
+  rules:
+    # No need to run if the package name is not set.
+    - if: '$CI_PACKAGE_NAME == ""'
+      when: never
+    # Execute only if the pipeline is triggered by a push to the default branch,
+    # and the package.json file exists in the specified path.
+    - if: >
+        $CI_PIPELINE_SOURCE == "push" &&
+        $CI_COMMIT_BRANCH == "$CI_DEFAULT_BRANCH"
+      exists:
+        - "${PACKAGE_JSON_PATH}"
+      when: on_success
+    # Manual trigger only for the default branch.
+    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+      exists:
+        - "${PACKAGE_JSON_PATH}"
+      when: manual
+      allow_failure: false
