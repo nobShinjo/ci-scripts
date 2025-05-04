@@ -56,7 +56,10 @@ fetch_ci_for_release:
   rules:
     # Execute only if the pipeline is triggered by a push to the default branch,
     # and the package.json file exists in the specified path.
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: >
+        $CI_PIPELINE_SOURCE == "push" &&
+        $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH &&
+        $CI_PACKAGE_NAME == ""
       when: always
     # Manual trigger only for the default branch.
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
@@ -88,7 +91,10 @@ bump_version:
   rules:
     # Execute only if the pipeline is triggered by a push to the default branch,
     # and the package.json file exists in the specified path.
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: >
+        $CI_PIPELINE_SOURCE == "push" &&
+        $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH &&
+        $CI_PACKAGE_NAME == ""
       when: on_success
     # Manual trigger only for the default branch.
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
@@ -141,7 +147,10 @@ update_changelog_for_release:
   rules:
     # Execute only if the pipeline is triggered by a push to the default branch,
     # and the package.json file exists in the specified path.
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: >
+        $CI_PIPELINE_SOURCE == "push" &&
+        $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH &&
+        $CI_PACKAGE_NAME == ""
       when: on_success
     # Manual trigger only for the default branch.
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
@@ -220,7 +229,10 @@ create_release:
   rules:
     # Execute only if the pipeline is triggered by a push to the default branch,
     # and the package.json file exists in the specified path.
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: >
+        $CI_PIPELINE_SOURCE == "push" &&
+        $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH &&
+        $CI_PACKAGE_NAME == ""
       when: on_success
     # Manual trigger only for the default branch.
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
