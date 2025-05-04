@@ -36,12 +36,6 @@ include:
       git-cliff --version
       echo "bash version $(bash --version | head -n1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')"
 
-.release_changelog_default_rules:
-  rules:
-    # Manual trigger for other branches.
-    - when: manual
-      allow_failure: false
-
 fetch_ci_for_changelog_for_release:
   # This job is responsible for fetching the CI scripts from the ci-scripts repository.
   # It clones the ci-scripts repository, copies the necessary files to the current directory.
@@ -54,6 +48,10 @@ fetch_ci_for_changelog_for_release:
   before_script:
     # Install git, configure GitLab CI job token, and update CA certificates.
     - !reference [.git-config, before_script]
+  rules:
+    # Manual trigger for other branches.
+    - when: manual
+      allow_failure: false
 
 generate_changelog_release:
   stage: release
@@ -100,3 +98,7 @@ generate_changelog_release:
       - $CHANGELOG_FILE
     when: always
     expire_in: 1 week
+  rules:
+    # Manual trigger for other branches.
+    - when: manual
+      allow_failure: false
