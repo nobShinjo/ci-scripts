@@ -61,8 +61,8 @@ fetch_ci_for_release:
   stage: fetch
   image: "alpine:latest"
   extends:
-    - .project_release_default_rules
     - .fetch_ci
+    - .project_release_default_rules
   before_script:
     # Install git, configure GitLab CI job token, and update CA certificates.
     - !reference [.git-config, before_script]
