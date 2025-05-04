@@ -44,11 +44,15 @@ variables:
 
 .project_release_default_rules:
   rules:
-    # This job will run only on the default branch (e.g., main or master).
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    # Execute only if the pipeline is triggered by a push to the default branch,
+    # and the package.json file exists in the specified path.
+    - if: >
+        $CI_PIPELINE_SOURCE == "push" &&
+        $CI_COMMIT_BRANCH == "$CI_DEFAULT_BRANCH"
       when: on_success
-    # This job will run manually for other branches.
-    - when: manual
+    # Manual trigger only for the default branch.
+    - if: "$CI_COMMIT_BRANCH = $CI_DEFAULT_BRANCH"
+      when: manual
 
 fetch_ci_for_release:
   # This job is responsible for fetching the CI scripts from the ci-scripts repository.
