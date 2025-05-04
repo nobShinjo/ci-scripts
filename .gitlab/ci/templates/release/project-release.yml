@@ -51,7 +51,7 @@ variables:
         $CI_COMMIT_BRANCH == "$CI_DEFAULT_BRANCH"
       when: on_success
     # Manual trigger only for the default branch.
-    - if: "$CI_COMMIT_BRANCH = $CI_DEFAULT_BRANCH"
+    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
       when: manual
 
 fetch_ci_for_release:
@@ -121,7 +121,7 @@ update_changelog_for_release:
       echo "📦 Committing changes..."
       git add $CHANGELOG_FILE
       git commit -m "docs(ci): update changelog for tag v$VERSION [ci skip]"
-      git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME --force-with-lease
+      git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME
       echo "🚀 Changelog updated successfully for version $VERSION"
   artifacts:
     name: "update_changelog_for_release"
@@ -151,7 +151,7 @@ create_release:
       echo "🚀 Creating release for version: v$VERSION"
     # Check if the release already exists
     - |
-      if git rev-parse --verify "v$VERSION" >/dev/null 2>&1; then
+      if git ls-remote --tags origin | grep -q "refs/tags/v$VERSION"; then
         echo "🚫 Release v$VERSION already exists. Skipping release creation."
         exit 0
       fi
@@ -164,7 +164,7 @@ create_release:
         echo "📦 Committing bumped $VERSION_FILE..."
         git add $VERSION_FILE
         git commit -m "chore(ci): bump version to v$VERSION [ci skip]"
-        git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME --force-with-lease
+        git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME
       fi
     # Generate release notes from CHANGELOG.md
     - |

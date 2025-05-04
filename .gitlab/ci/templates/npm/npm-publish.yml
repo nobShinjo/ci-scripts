@@ -186,7 +186,7 @@ update_changelog_for_npm:
       echo "📦 Committing changes..."
       git add $CHANGELOG_FILE
       git commit -m "docs(ci): update changelog for tag v$VERSION [ci skip]"
-      git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME --force-with-lease
+      git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME
       echo "🚀 Changelog updated successfully for version $VERSION"
   artifacts:
     name: "update_changelog_for_npm"
@@ -215,7 +215,7 @@ publish_upm_publish:
       echo "🚀 Publishing version: $VERSION"
     # Check if the release already exists
     - |
-      if git rev-parse --verify "v$VERSION" >/dev/null 2>&1; then
+      if git ls-remote --tags origin | grep -q "refs/tags/v$VERSION"; then
         echo "🚫 Release v$VERSION already exists. Skipping release creation."
         exit 0
       fi
@@ -228,7 +228,7 @@ publish_upm_publish:
         echo "💡 Committing bumped package.json..."
         git add "$PACKAGE_JSON_PATH"
         git commit -m "chore(ci): bump version to v$VERSION [ci skip]"
-        git push -o ci.skip origin "$CI_COMMIT_BRANCH" --force-with-lease
+        git push -o ci.skip origin "$CI_COMMIT_BRANCH"
       fi
     # Tags the current HEAD with the new version number.
     - |
