@@ -39,10 +39,10 @@ include:
 .release_changelog_default_rules:
   rules:
     # Manual trigger for other branches.
-    - when: never
+    - when: manual
       allow_failure: false
 
-fetch_ci_for_changelog:
+fetch_ci_for_changelog_for_release:
   # This job is responsible for fetching the CI scripts from the ci-scripts repository.
   # It clones the ci-scripts repository, copies the necessary files to the current directory.
   # This ensures that the latest CI scripts are always used.  stage: fetch
@@ -61,7 +61,7 @@ generate_changelog_release:
   extends:
     - .default_before_script
     - .release_changelog_default_rules
-  needs: [fetch_ci_for_changelog]
+  needs: [fetch_ci_for_changelog_for_release]
   script:
     # Release changelog generation
     - |

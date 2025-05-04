@@ -52,7 +52,7 @@ include:
     - when: manual
       allow_failure: false
 
-fetch_ci_for_changelog:
+fetch_ci_for_changelog_for_draft:
   # This job is responsible for fetching the CI scripts from the ci-scripts repository.
   # It clones the ci-scripts repository, copies the necessary files to the current directory.
   # This ensures that the latest CI scripts are always used.  stage: fetch
@@ -71,9 +71,7 @@ generate_feature_branch_changelog_draft:
   extends:
     - .default_before_script
     - .draft_changelog_default_rules
-  needs:
-    - job: fetch_ci_for_changelog
-      optional: true
+  needs: [fetch_ci_for_changelog_for_draft]
   script:
     # Generate changelog draft using git-cliff.
     - |
