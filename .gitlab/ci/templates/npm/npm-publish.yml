@@ -296,7 +296,7 @@ publish_upm_publish:
       echo "🔑 Creating .npmrc file..."
       NPMRC_PATH="$DIST_DIR/.npmrc"
       trap "rm -f $NPMRC_PATH" EXIT
-      cat "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${NPM_TOKEN}" > "$NPMRC_PATH"
+      echo "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${NPM_TOKEN}" > "$NPMRC_PATH"
 
       echo "🔑 Authenticating with GitLab npm registry..."
       cd "$DIST_DIR"
