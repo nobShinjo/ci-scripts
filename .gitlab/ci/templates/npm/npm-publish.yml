@@ -51,13 +51,20 @@ variables:
 
 .npm_publish_default_rules:
   rules:
+    # No need to run if the package name is not set.
     - if: '$CI_PACKAGE_NAME == ""'
       when: never
-    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+    # Execute only if the pipeline is triggered by a push to the default branch,
+    # and the package.json file exists in the specified path.
+    - if: >
+        $CI_PIPELINE_SOURCE == "push" &&
+        $CI_COMMIT_BRANCH == "$CI_DEFAULT_BRANCH"
       exists:
         - "${PACKAGE_JSON_PATH}"
       when: on_success
-    - exists:
+    # Manual trigger only for the default branch.
+    - if: "$CI_COMMIT_BRANCH = $CI_DEFAULT_BRANCH"
+      exists:
         - "${PACKAGE_JSON_PATH}"
       when: manual
 
