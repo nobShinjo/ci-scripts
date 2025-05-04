@@ -82,8 +82,8 @@ generate_changelog_draft:
       fi
     # Fetch main branch for comparison.
     - |
-      echo "📥 Fetching origin/main..."
-      git fetch origin main
+      echo "📥 Fetching origin/$CI_DEFAULT_BRANCH..."
+      git fetch origin $CI_DEFAULT_BRANCH
     # Ensure CHANGELOG_FILE exists for --prepend
     - |
       echo "🗂️ Ensuring $CHANGELOG_FILE exists..."

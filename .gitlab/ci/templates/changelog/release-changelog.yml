@@ -71,8 +71,8 @@ generate_changelog_release:
       fi
     # Fetch main branch for comparison
     - |
-      echo "📥 Fetching origin/main..."
-      git fetch origin main
+      echo "📥 Fetching origin/$CI_DEFAULT_BRANCH..."
+      git fetch origin $CI_DEFAULT_BRANCH
     # Generate final changelog
     - |
       echo "📝 Generating final changelog..."
