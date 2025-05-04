@@ -62,7 +62,9 @@ fetch_ci_for_release:
         $CI_PACKAGE_NAME == ""
       when: always
     # Manual trigger only for the default branch.
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: >
+        $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH &&
+        $CI_PACKAGE_NAME == ""
       when: manual
       allow_failure: true
 
@@ -97,7 +99,9 @@ bump_version:
         $CI_PACKAGE_NAME == ""
       when: on_success
     # Manual trigger only for the default branch.
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: >
+        $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH &&
+        $CI_PACKAGE_NAME == ""
       when: manual
       allow_failure: true
 
@@ -153,7 +157,9 @@ update_changelog_for_release:
         $CI_PACKAGE_NAME == ""
       when: on_success
     # Manual trigger only for the default branch.
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: >
+        $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH &&
+        $CI_PACKAGE_NAME == ""
       when: manual
       allow_failure: true
 
@@ -235,6 +241,8 @@ create_release:
         $CI_PACKAGE_NAME == ""
       when: on_success
     # Manual trigger only for the default branch.
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: >
+        $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH &&
+        $CI_PACKAGE_NAME == ""
       when: manual
       allow_failure: true
