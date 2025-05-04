@@ -169,6 +169,7 @@ create_release:
     # Commit and push the change to the VERSION.yml if it was modified
     - |
       echo " Checking if $VERSION_FILE was modified..."
+      cat $VERSION_FILE
       if git diff --exit-code $VERSION_FILE; then
         echo "ℹ️ No changes in $VERSION_FILE, skipping commit."
       else
