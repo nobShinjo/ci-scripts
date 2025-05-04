@@ -50,7 +50,7 @@ fetch_ci_for_changelog_for_release:
   rules:
     # Manual trigger for other branches.
     - when: manual
-      allow_failure: false
+      allow_failure: true
 
 generate_changelog_release:
   stage: release
@@ -99,4 +99,4 @@ generate_changelog_release:
   rules:
     # Manual trigger for other branches.
     - when: manual
-      allow_failure: false
+      allow_failure: true
