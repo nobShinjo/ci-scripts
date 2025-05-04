@@ -43,7 +43,6 @@ fetch_ci_for_changelog_for_release:
   stage: fetch
   image: "alpine:latest"
   extends:
-    - .release_changelog_default_rules
     - .fetch_ci
   before_script:
     # Install git, configure GitLab CI job token, and update CA certificates.
@@ -58,7 +57,6 @@ generate_changelog_release:
   image: "alpine:latest"
   extends:
     - .default_before_script
-    - .release_changelog_default_rules
   needs: [fetch_ci_for_changelog_for_release]
   script:
     # Release changelog generation

@@ -67,7 +67,6 @@ generate_feature_branch_changelog_draft:
   image: "alpine:latest"
   extends:
     - .default_before_script
-    - .draft_changelog_default_rules
   needs: [fetch_ci_for_changelog_for_draft]
   script:
     # Generate changelog draft using git-cliff.
