@@ -106,7 +106,7 @@ generate_feature_branch_changelog_draft:
         git add $CHANGELOG_FILE
         git commit -m "docs(ci): update draft changelog [ci skip]"
         git push -o ci.skip origin HEAD:$CI_COMMIT_REF_NAME
-        echo "🚀 Draft changelog updated successfully
+        echo "🚀 Draft changelog updated successfully"
         echo "📌 Please review the draft changelog."
       else
         echo "ℹ️ No changes in $CHANGELOG_FILE, skipping commit."
