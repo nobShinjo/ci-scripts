@@ -139,7 +139,7 @@ function validate_version() {
 if [ ! -f "$VERSION_FILE" ]; then
     echo "📝 Initialize $VERSION_FILE"
     echo "version: 0.0.0" >"$VERSION_FILE"
-    echo "version_bump_hint: major" >>"$VERSION_FILE"
+    echo "version_bump_hint: minor" >>"$VERSION_FILE"
 fi
 
 # Read the current version and type from "$VERSION_FILE"
