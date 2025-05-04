@@ -9,7 +9,7 @@
 #
 # Features:
 #     - Generates a draft changelog based on commit messages using git-cliff.
-#     - The draft is generated in the .changelog_draft.md file.
+#     - The draft is generated in the CHANGELOG.md file. (with --prepend option)
 #     - The draft is generated only for merge requests and feature branches.
 #     - The draft is generated only if the .cliff.toml file exists.
 #     - The draft is generated only if the job is triggered manually or automatically.
@@ -50,6 +50,7 @@ include:
       when: on_success
     # Manual trigger for other branches.
     - when: manual
+      allow_failure: false
 
 fetch_ci_for_changelog:
   # This job is responsible for fetching the CI scripts from the ci-scripts repository.
@@ -64,7 +65,7 @@ fetch_ci_for_changelog:
     # Install git, configure GitLab CI job token, and update CA certificates.
     - !reference [.git-config, before_script]
 
-generate_changelog_draft:
+generate_feature_branch_changelog_draft:
   stage: draft
   image: "alpine:latest"
   extends:

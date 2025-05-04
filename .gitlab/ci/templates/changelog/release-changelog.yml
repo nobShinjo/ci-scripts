@@ -40,6 +40,7 @@ include:
   rules:
     # Manual trigger for other branches.
     - when: manual
+      allow_failure: false
 
 fetch_ci_for_changelog:
   # This job is responsible for fetching the CI scripts from the ci-scripts repository.
