@@ -49,7 +49,7 @@ include:
         $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^feature\//
       when: on_success
     # Manual trigger for other branches.
-    - when: manual
+    - when: never
       allow_failure: false
 
 fetch_ci_for_changelog:

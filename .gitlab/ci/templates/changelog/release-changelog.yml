@@ -39,7 +39,7 @@ include:
 .release_changelog_default_rules:
   rules:
     # Manual trigger for other branches.
-    - when: manual
+    - when: never
       allow_failure: false
 
 fetch_ci_for_changelog:
