@@ -49,8 +49,6 @@ variables:
       npm -v
       echo "bash version $(bash --version | head -n1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')"
 
-.npm_publish_default_rules:
-
 fetch_ci_for_npm:
   # This job is responsible for fetching the CI scripts from the ci-scripts repository.
   # It clones the ci-scripts repository, copies the necessary files to the current directory.
