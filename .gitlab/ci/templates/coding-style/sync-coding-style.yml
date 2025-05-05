@@ -72,6 +72,8 @@ sync-editorconfig:
       done
     - echo "Get all branches in the repository..."
     - git fetch --all
+    - git ls-remote --heads origin
+    - git ls-remote --heads origin || echo "🚨 git ls-remote failed"
     - REMOTE_BRANCHES=$(git ls-remote --heads origin | grep 'refs/heads/feature/' | sed 's#refs/heads/##')
     - |
       echo "🔄 Found remote branches: ${REMOTE_BRANCHES}"
