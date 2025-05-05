@@ -22,6 +22,8 @@
     # If `ci-scripts` directory exists, fetch the latest changes.
     # Otherwise, clone the repository.
     - |
+      echo "🧹 Clean old files..."
+      git clean -fdx
       echo "🔄 Fetching CI scripts..."
       if [ -d ".gitlab" ]; then
         echo "🔄 CI scripts found. Fetching latest changes..."
