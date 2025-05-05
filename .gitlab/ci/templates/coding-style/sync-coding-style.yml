@@ -52,6 +52,8 @@ sync-editorconfig:
     # Generate .editorconfig using the script
     - |
       echo "🔨 Generating .editorconfig file..."
+      pwd
+      echo "📂 Current directory: ${CI_PROJECT_DIR}"
       cd ${TEMP_DIR}
       if [ ! -f "generate_editorconfig.sh" ]; then
         echo "❌ Error: generate_editorconfig.sh script not found"
