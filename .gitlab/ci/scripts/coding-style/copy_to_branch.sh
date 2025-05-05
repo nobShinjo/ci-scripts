@@ -12,8 +12,10 @@ FILES=$2
 # Main
 # ==========================
 echo "🔄 Switch to branch ${BRANCH_NAME}…"
+ls -al
 if git show-ref --verify --quiet "refs/heads/${BRANCH_NAME}"; then
     git checkout "${BRANCH_NAME}"
+    git pull origin "${BRANCH_NAME}"
 else
     git checkout -b "${BRANCH_NAME}" "origin/${BRANCH_NAME}"
 fi

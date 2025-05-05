@@ -32,8 +32,6 @@ fetch_ci_for_sync_coding_style:
   before_script:
     # Install git, configure GitLab CI job token, and update CA certificates.
     - !reference [.git-config, before_script]
-    - echo "Listing files in the current directory..."
-    - ls -al
   only:
     - schedules
 
@@ -44,16 +42,12 @@ sync-editorconfig:
   extends:
     - .sync_coding_style_before_script
   script:
-    - echo "Listing files in the current directory..."
-    - ls -al
     # Clone code-analysis-ruleset repository
     - |
       echo "🔃 Coding Style Syncing..."
       echo "📥 Cloning code-analysis-ruleset repository..."
       TEMP_DIR=$(mktemp -d)
       git clone --depth=1 --branch main ${CODE_STYLE_REPO} ${TEMP_DIR}
-    - echo "Listing files in the current directory..."
-    - ls -al
     # Generate .editorconfig using the script
     - |
       echo "🔨 Generating .editorconfig file..."
@@ -65,8 +59,6 @@ sync-editorconfig:
       bash generate_editorconfig.sh
       cd ${CI_PROJECT_DIR}
       echo "✅ Successfully generated .editorconfig file"
-    - echo "Listing files in the current directory..."
-    - ls -al
     # Define files to be copied
     - |
       FILES_TO_COPY="${TEMP_DIR}/.editorconfig ${TEMP_DIR}/stylecop.json ${TEMP_DIR}/Directory.build.props"
@@ -89,8 +81,6 @@ sync-editorconfig:
         REMOTE_BRANCHES="main $(echo "$REMOTE_FEATURE_OUTPUT" | sed 's#refs/heads/##')"
       fi
       echo "🔍 Found remote branches: ${REMOTE_BRANCHES}"
-    - echo "Listing files in the current directory..."
-    - ls -al
     # Copy files to target branches (main and feature/*)
     # Get remote branches matching the pattern feature/*,
     # and loop through each branch and copy the files.
