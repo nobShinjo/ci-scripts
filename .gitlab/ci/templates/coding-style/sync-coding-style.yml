@@ -2,12 +2,12 @@ stages:
   - fetch
   - update
 
-variables:
-  CODE_STYLE_REPO: "https://${CI_SERVER_HOST}/line-simulation/code-analysis-ruleset.git"
-
 include:
   - .gitlab/ci/templates/fetch/fetch-ci.yml
   - .gitlab/ci/templates/git/git-config.yml
+
+variables:
+  CODE_STYLE_REPO: "https://${CI_SERVER_HOST}/line-simulation/code-analysis-ruleset.git"
 
 .sync_coding_style_before_script:
   variables: !reference [.git-config, variables]
@@ -87,11 +87,11 @@ sync-editorconfig:
         done
         if git diff --staged --quiet; then
           echo "ℹ️ No changes to commit for branch ${branch}, skipping..."
-          return 0
+        else
+          echo "✏️ Committing changes to ${branch}..."
+          git commit -m "chore(coding-style): Update coding style files [ci skip]"
+          git push origin "${branch}"
         fi
-        echo "✏️ Committing changes to $branch"
-        git commit -m "chore(coding-style): Update coding style files [ci skip]"
-        git push origin ${branch}
       }
 
       copy_to_branch main "${FILES_TO_COPY}"
