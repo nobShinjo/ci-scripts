@@ -40,7 +40,6 @@ sync-editorconfig:
     - .sync_coding_style_before_script
   variables:
     CODE_STYLE_REPO: "https://${CI_SERVER_HOST}/line-simulation/code-analysis-ruleset.git"
-    SHELL: "/bin/bash"
   script:
     # Clone code-analysis-ruleset repository
     - |
@@ -63,13 +62,8 @@ sync-editorconfig:
 
     # Define files to be copied
     - |
-      #!/bin/bash
-      FILES_TO_COPY=(
-        "${TEMP_DIR}/.editorconfig"
-        "${TEMP_DIR}/stylecop.json"
-        "${TEMP_DIR}/Directory.Build.props"
-      )
-      for file in "${FILES_TO_COPY[@]}"; do
+      FILES_TO_COPY="${TEMP_DIR}/.editorconfig ${TEMP_DIR}/stylecop.json ${TEMP_DIR}/Directory.Build.props"
+      for file in ${FILES_TO_COPY}; do
         if [ ! -f "${file}" ]; then
           echo "❌ Error: ${file} not found in code-analysis-ruleset"
           exit 1
@@ -81,10 +75,10 @@ sync-editorconfig:
     # and loop through each branch and copy the files.
     - |
       echo "📋 Copying files to target branches..."
-      bash .gitlab/ci/scripts/code-style/copy_to_branch.sh ${CI_DEFAULT_BRANCH} ${FILES_TO_COPY[@]}
+      bash .gitlab/ci/scripts/code-style/copy_to_branch.sh ${CI_DEFAULT_BRANCH} ${FILES_TO_COPY}
       REMOTE_BRANCHES=$(git branch -r | grep -E "origin/feature/" | sed 's/origin\///')
       for BRANCH in ${REMOTE_BRANCHES}; do
-        bash .gitlab/ci/scripts/code-style/copy_to_branch.sh ${BRANCH} ${FILES_TO_COPY[@]}
+        bash .gitlab/ci/scripts/code-style/copy_to_branch.sh ${BRANCH} ${FILES_TO_COPY}
       done
 
     # Cleanup
