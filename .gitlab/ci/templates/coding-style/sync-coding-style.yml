@@ -68,15 +68,6 @@ sync-editorconfig:
           exit 1
         fi
       done
-    - echo "▶️ before fetch/checkout"
-    - git rev-parse HEAD
-    - git rev-parse origin/main || true
-    - git fetch origin main --prune
-    - git checkout main
-    - git reset --hard origin/main
-    - echo "▶️ after reset"
-    - git rev-parse HEAD
-    - git rev-parse origin/main
     # Get all branches in the repository
     - |
       echo "🔍 Looking for remote feature branches..."

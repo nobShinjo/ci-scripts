@@ -12,21 +12,18 @@ FILES=$2
 # Main
 # ==========================
 echo "🔄 Switch to branch ${BRANCH_NAME}…"
-ls -al
 if git show-ref --verify --quiet "refs/heads/${BRANCH_NAME}"; then
     git checkout "${BRANCH_NAME}"
-    git pull origin "${BRANCH_NAME}"
+    git reset --hard origin/main
 else
     git checkout -b "${BRANCH_NAME}" "origin/${BRANCH_NAME}"
 fi
 echo "📋 Copying files to branch ${BRANCH_NAME}..."
-ls -al
 for file in ${FILES}; do
     DEST="$CI_PROJECT_DIR/$(basename "${file}")"
     cp "${file}" "${DEST}"
     git add "${DEST}"
 done
-git status
 if ! git diff --staged --quiet; then
     echo "✏️ Committing changes to ${BRANCH_NAME}..."
     git commit -m "chore(coding-style): Update coding style files [ci skip]"
