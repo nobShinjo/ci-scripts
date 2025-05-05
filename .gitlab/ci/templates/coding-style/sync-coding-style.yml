@@ -2,6 +2,9 @@ stages:
   - fetch
   - update
 
+variables:
+  CODE_STYLE_REPO: "https://${CI_SERVER_HOST}/line-simulation/code-analysis-ruleset.git"
+
 include:
   - .gitlab/ci/templates/fetch/fetch-ci.yml
   - .gitlab/ci/templates/git/git-config.yml
@@ -37,8 +40,6 @@ sync-editorconfig:
   needs: [fetch_ci_for_sync_coding_style]
   extends:
     - .sync_coding_style_before_script
-  variables:
-    CODE_STYLE_REPO: "https://${CI_SERVER_HOST}/line-simulation/code-analysis-ruleset.git"
   script:
     # Clone code-analysis-ruleset repository
     - |
