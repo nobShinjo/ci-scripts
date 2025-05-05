@@ -32,7 +32,8 @@ variables:
   PACKAGE_JSON_PATH: "Assets/${PACKAGE_NAME}/package.json"
   CHANGELOG_FILE: "CHANGELOG.md"
   DIST_DIR: "dist"
-  NPM_REGISTRY_URL: "https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/"
+  NPM_PROJECT_ID: "${CI_NPM_PROJECT_ID}"
+  NPM_REGISTRY_URL: "https://${CI_SERVER_HOST}/api/v4/projects/${NPM_PROJECT_ID}/packages/npm/"
 
 .npm_publish_before_script:
   variables: !reference [.git-config, variables]
@@ -296,9 +297,9 @@ publish_upm_publish:
       echo "🔑 Creating .npmrc file..."
       NPMRC_PATH="$DIST_DIR/.npmrc"
       trap "rm -f $NPMRC_PATH" EXIT
-      echo "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${NPM_TOKEN}" > "$NPMRC_PATH"
+      echo "//${CI_SERVER_HOST}/api/v4/projects/${NPM_PROJECT_ID}/packages/npm/:_authToken=${NPM_TOKEN}" > "$NPMRC_PATH"
       echo "strict-ssl=false" >> "$NPMRC_PATH"
-      echo "registry=https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/" >> "$NPMRC_PATH"
+      echo "registry=${NPM_REGISTRY_URL}" >> "$NPMRC_PATH"
       echo "always-auth=true" >> "$NPMRC_PATH"
 
       echo "🔑 Authenticating with GitLab npm registry..."
