@@ -74,13 +74,16 @@ sync-editorconfig:
     # Get remote branches matching the pattern feature/*,
     # and loop through each branch and copy the files.
     - |
-      echo "📋 Copying files to target branches..."
-
       function copy_to_branch() {
         local branch=$1
         local files=$2
-        echo "🔄 Copying files to branch ${branch}..."
-        git checkout ${branch}
+        echo "🔄 Switch to branch ${branch}…"
+        if git show-ref --verify --quiet "refs/heads/${branch}"; then
+          git checkout "${branch}"
+        else
+          git checkout -b "${branch}" "origin/${branch}"
+        fi
+        echo "📋 Copying files to branch ${branch}..."
         for file in ${files}; do
           cp "${file}" .
           git add "$(basename "$file")"
@@ -93,15 +96,19 @@ sync-editorconfig:
           git push origin "${branch}"
         fi
       }
+
+      echo "📋 Copying files to target branches..."
       git fetch --prune origin
       REMOTE_BRANCHES=$(git branch -r | grep -E "origin/feature/" | sed 's/origin\///')
+      echo "🔄 Found remote branches: ${REMOTE_BRANCHES}"
       for BRANCH in main ${REMOTE_BRANCHES}; do
+        echo "🔄 Processing branch ${BRANCH}..."
         copy_to_branch "$BRANCH" "$FILES_TO_COPY"
       done
+      echo "✅ Sync completed successfully"
   after_script:
     - |
       echo "🧹 Cleaning up temporary directory..."
       rm -rf ${TEMP_DIR}
-      echo "✅ Sync completed successfully"
   only:
     - schedules
