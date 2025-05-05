@@ -96,16 +96,16 @@ variables:
   CHANGELOG_FILE: "CHANGELOG.md"
 
 include:
-  - project: "LineSimulation/unity-npm/ci-scripts"
+  - project: "line-simulation/unity-npm/ci-scripts"
     ref: "feature/add-ci-templates"
     file: "/.gitlab/ci/templates/fetch/fetch-ci.yml"
-  - project: LineSimulation/unity-npm/ci-scripts
+  - project: line-simulation/unity-npm/ci-scripts
     ref: feature/add-ci-templates
     file: /.gitlab/ci/templates/changelog/common.yml
-  - project: LineSimulation/unity-npm/ci-scripts
+  - project: line-simulation/unity-npm/ci-scripts
     ref: feature/add-ci-templates
     file: /.gitlab/ci/templates/npm/npm-publish.yml
-  - project: LineSimulation/unity-npm/ci-scripts
+  - project: line-simulation/unity-npm/ci-scripts
     ref: feature/add-ci-templates
     file: /.gitlab/ci/templates/release/project-release.yml
 
