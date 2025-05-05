@@ -63,6 +63,7 @@ sync-editorconfig:
     # Define files to be copied
     - |
       FILES_TO_COPY="${TEMP_DIR}/.editorconfig ${TEMP_DIR}/stylecop.json ${TEMP_DIR}/Directory.Build.props"
+      ls -l ${TEMP_DIR}
       for file in ${FILES_TO_COPY}; do
         if [ ! -f "${file}" ]; then
           echo "❌ Error: ${file} not found in code-analysis-ruleset"
