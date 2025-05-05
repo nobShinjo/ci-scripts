@@ -82,7 +82,7 @@ sync-editorconfig:
       else
         REMOTE_BRANCHES="main $(echo "$REMOTE_FEATURE_OUTPUT" | sed 's#refs/heads/##')"
       fi
-      echo "🔄 Found remote branches: ${REMOTE_BRANCHES}"
+      echo "🔍 Found remote branches: ${REMOTE_BRANCHES}"
 
     # Copy files to target branches (main and feature/*)
     # Get remote branches matching the pattern feature/*,
@@ -90,7 +90,7 @@ sync-editorconfig:
     - |
       echo "📋 Copying files to target branches..."
       for BRANCH in main ${REMOTE_BRANCHES}; do
-        bash +x .gitlab/ci/templates/git/copy_to_branch.sh "$BRANCH" "$FILES_TO_COPY"
+        bash +x .gitlab/ci/scripts/coding-style/copy_to_branch.sh "$BRANCH" "$FILES_TO_COPY"
       done
       echo "✅ Sync completed successfully"
   after_script:
