@@ -27,7 +27,7 @@ for file in "${FILES_TO_COPY[@]}"; do
       continue
    fi
    cp "$file" .
-   git add "$file"
+   git add $(basename "$file")
 done
 
 # Commit changes if there are any
