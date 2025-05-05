@@ -82,8 +82,8 @@ sync-editorconfig:
         echo "🔄 Copying files to branch ${branch}..."
         git checkout ${branch}
         for file in ${files}; do
-          cp ${file} .
-          git add $(basename ${file})
+          cp "${file}" .
+          git add "$(basename "$file")"
         done
         if git diff --staged --quiet; then
           echo "ℹ️ No changes to commit for branch ${branch}, skipping..."
@@ -93,14 +93,12 @@ sync-editorconfig:
           git push origin "${branch}"
         fi
       }
-
-      copy_to_branch main "${FILES_TO_COPY}"
+      git fetch --prune origin
       REMOTE_BRANCHES=$(git branch -r | grep -E "origin/feature/" | sed 's/origin\///')
-      for BRANCH in ${REMOTE_BRANCHES}; do
-        copy_to_branch ${BRANCH} "${FILES_TO_COPY}"
+      for BRANCH in main ${REMOTE_BRANCHES}; do
+        copy_to_branch "$BRANCH" "$FILES_TO_COPY"
       done
-
-    # Cleanup
+  after_script:
     - |
       echo "🧹 Cleaning up temporary directory..."
       rm -rf ${TEMP_DIR}
