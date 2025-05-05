@@ -62,6 +62,7 @@ sync-editorconfig:
 
     # Define files to be copied
     - |
+      #!/bin/bash
       FILES_TO_COPY=(
         "${TEMP_DIR}/.editorconfig"
         "${TEMP_DIR}/stylecop.json"
