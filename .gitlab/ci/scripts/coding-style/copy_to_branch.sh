@@ -19,9 +19,9 @@ else
 fi
 echo "📋 Copying files to branch ${BRANCH_NAME}..."
 for file in ${FILES}; do
-    local dest="$CI_PROJECT_DIR/$file"
-    cp "${file}" "${dest}"
-    git add "${dest}"
+    DEST="$CI_PROJECT_DIR/$file"
+    cp "${file}" "${DEST}"
+    git add "${DEST}"
 done
 git status
 if ! git diff --staged --quiet; then
