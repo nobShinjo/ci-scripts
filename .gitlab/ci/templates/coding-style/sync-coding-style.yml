@@ -13,9 +13,8 @@ include:
     - !reference [.git-config, before_script]
     # Install necessary tools
     - |
-      apk add --no-cache git-cliff bash > /dev/null 2>&1
+      apk add --no-cache bash > /dev/null 2>&1
       echo "📦 Tool Versions:"
-      git-cliff --version
       echo "bash version $(bash --version | head -n1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')"
 
 fetch_ci_for_sync_coding_style:
@@ -75,10 +74,29 @@ sync-editorconfig:
     # and loop through each branch and copy the files.
     - |
       echo "📋 Copying files to target branches..."
-      bash .gitlab/ci/scripts/code-style/copy_to_branch.sh ${CI_DEFAULT_BRANCH} ${FILES_TO_COPY}
+
+      function copy_to_branch() {
+        local branch=$1
+        local files=$2
+        echo "🔄 Copying files to branch ${branch}..."
+        git checkout ${branch}
+        for file in ${files}; do
+          cp ${file} .
+          git add $(basename ${file})
+        done
+        if git diff --staged --quiet; then
+          echo "ℹ️ No changes to commit for branch ${branch}, skipping..."
+          return 0
+        fi
+        echo "✏️ Committing changes to $branch"
+        git commit -m "chore(coding-style): Update coding style files [ci skip]"
+        git push origin ${branch}
+      }
+
+      copy_to_branch main "${FILES_TO_COPY}"
       REMOTE_BRANCHES=$(git branch -r | grep -E "origin/feature/" | sed 's/origin\///')
       for BRANCH in ${REMOTE_BRANCHES}; do
-        bash .gitlab/ci/scripts/code-style/copy_to_branch.sh ${BRANCH} ${FILES_TO_COPY}
+        copy_to_branch ${BRANCH} "${FILES_TO_COPY}"
       done
 
     # Cleanup
