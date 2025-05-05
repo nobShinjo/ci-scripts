@@ -40,6 +40,7 @@ sync-editorconfig:
     - .sync_coding_style_before_script
   variables:
     CODE_STYLE_REPO: "https://${CI_SERVER_HOST}/line-simulation/code-analysis-ruleset.git"
+    SHELL: "/bin/bash"
   script:
     # Clone code-analysis-ruleset repository
     - |
