@@ -22,10 +22,11 @@ for file in ${FILES}; do
     cp "${file}" .
     git add "$(basename "$file")"
 done
-if git diff --staged --quiet; then
-    echo "ℹ️ No changes to commit for branch ${BRANCH_NAME}, skipping..."
-else
+git status
+if ! git diff --staged --quiet; then
     echo "✏️ Committing changes to ${BRANCH_NAME}..."
     git commit -m "chore(coding-style): Update coding style files [ci skip]"
     git push origin "${BRANCH_NAME}"
+else
+    echo "ℹ️ No changes to commit for branch ${BRANCH_NAME}, skipping..."
 fi

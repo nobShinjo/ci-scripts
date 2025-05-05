@@ -89,7 +89,7 @@ sync-editorconfig:
     # and loop through each branch and copy the files.
     - |
       echo "📋 Copying files to target branches..."
-      for BRANCH in main ${REMOTE_BRANCHES}; do
+      for BRANCH in ${REMOTE_BRANCHES}; do
         bash +x .gitlab/ci/scripts/coding-style/copy_to_branch.sh "$BRANCH" "$FILES_TO_COPY"
       done
       echo "✅ Sync completed successfully"
