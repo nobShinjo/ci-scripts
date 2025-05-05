@@ -25,6 +25,9 @@ include:
 
 workflow:
   rules:
+    # When a pipeline is triggered by a schedule, run the pipeline.
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: always
     # When a merge request is created or updated, run the pipeline.
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       when: always

@@ -1,0 +1,94 @@
+stages:
+  - fetch
+  - update
+
+include:
+  - .gitlab/ci/templates/fetch/fetch-ci.yml
+  - .gitlab/ci/templates/git/git-config.yml
+
+.sync_coding_style_before_script:
+  variables: !reference [.git-config, variables]
+  before_script:
+    # Install git, configure GitLab CI job token, and update CA certificates.
+    - !reference [.git-config, before_script]
+    # Install necessary tools
+    - |
+      apk add --no-cache git-cliff bash > /dev/null 2>&1
+      echo "📦 Tool Versions:"
+      git-cliff --version
+      echo "bash version $(bash --version | head -n1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')"
+
+fetch_ci_for_sync_coding_style:
+  # This job is responsible for fetching the CI scripts from the ci-scripts repository.
+  # It clones the ci-scripts repository, copies the necessary files to the current directory.
+  # This ensures that the latest CI scripts are always used.  stage: fetch
+  stage: fetch
+  image: "alpine:latest"
+  extends:
+    - .fetch_ci
+  before_script:
+    # Install git, configure GitLab CI job token, and update CA certificates.
+    - !reference [.git-config, before_script]
+  only:
+    - schedules
+
+sync-editorconfig:
+  stage: update
+  image: alpine:latest
+  needs: [fetch_ci_for_sync_coding_style]
+  extends:
+    - .sync_coding_style_before_script
+  variables:
+    CODE_STYLE_REPO: "https://${CI_SERVER_HOST}/line-simulation/code-analysis-ruleset.git"
+  script:
+    # Clone code-analysis-ruleset repository
+    - |
+      echo "🔃 Coding Style Syncing..."
+      echo "📥 Cloning code-analysis-ruleset repository..."
+      TEMP_DIR=$(mktemp -d)
+      git clone --depth=1 --branch main ${CODE_STYLE_REPO} ${TEMP_DIR}
+
+    # Generate .editorconfig using the script
+    - |
+      echo "🔨 Generating .editorconfig file..."
+      cd ${TEMP_DIR}
+      if [ ! -f "generate_editorconfig.sh" ]; then
+        echo "❌ Error: generate_editorconfig.sh script not found"
+        exit 1
+      fi
+      bash generate_editorconfig.sh
+      cd ${CI_PROJECT_DIR}
+      echo "✅ Successfully generated .editorconfig file"
+
+    # Define files to be copied
+    - |
+      FILES_TO_COPY=(
+        "${TEMP_DIR}/.editorconfig"
+        "${TEMP_DIR}/stylecop.json"
+        "${TEMP_DIR}/Directory.Build.props"
+      )
+      for file in "${FILES_TO_COPY[@]}"; do
+        if [ ! -f "${file}" ]; then
+          echo "❌ Error: ${file} not found in code-analysis-ruleset"
+          exit 1
+        fi
+      done
+
+    # Copy files to target branches (main and feature/*)
+    # Get remote branches matching the pattern feature/*,
+    # and loop through each branch and copy the files.
+    - |
+      echo "📋 Copying files to target branches..."
+      bash .gitlab/ci/scripts/code-style/copy_to_branch.sh ${CI_DEFAULT_BRANCH} ${FILES_TO_COPY[@]}
+      REMOTE_BRANCHES=$(git branch -r | grep -E "origin/feature/" | sed 's/origin\///')
+      for BRANCH in ${REMOTE_BRANCHES}; do
+        bash .gitlab/ci/scripts/code-style/copy_to_branch.sh ${BRANCH} ${FILES_TO_COPY[@]}
+      done
+
+    # Cleanup
+    - |
+      echo "🧹 Cleaning up temporary directory..."
+      rm -rf ${TEMP_DIR}
+      echo "✅ Sync completed successfully"
+  only:
+    - schedules

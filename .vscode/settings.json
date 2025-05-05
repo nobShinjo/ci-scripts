@@ -1,8 +1,10 @@
 {
     "cSpell.words": [
         "elif",
+        "mktemp",
         "netrc",
         "pipefail",
+        "stylecop",
         "unshallow",
         "userconfig",
         "vecho"
