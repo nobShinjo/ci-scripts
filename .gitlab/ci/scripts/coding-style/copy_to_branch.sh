@@ -18,14 +18,11 @@ else
     git checkout -b "${BRANCH_NAME}" "origin/${BRANCH_NAME}"
 fi
 echo "📋 Copying files to branch ${BRANCH_NAME}..."
-echo "Pwd: $(pwd)"
-echo ${CI_PROJECT_DIR}
 ls -l
 for file in ${FILES}; do
     DEST="$CI_PROJECT_DIR/$(basename "${file}")"
     cp "${file}" "${DEST}"
     git add "${DEST}"
-    echo "file: $(cat "${DEST}")"
 done
 git status
 if ! git diff --staged --quiet; then
