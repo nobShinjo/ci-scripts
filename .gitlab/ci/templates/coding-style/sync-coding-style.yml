@@ -75,8 +75,7 @@ sync-editorconfig:
     # and loop through each branch and copy the files.
     - |
       echo "📋 Copying files to target branches..."
-      git fetch --prune origin
-      REMOTE_BRANCHES=$(git branch -r | grep -E "origin/feature/" | sed 's/origin\///')
+      REMOTE_BRANCHES=$(git ls-remote --heads origin | grep 'refs/heads/feature/' | sed 's#refs/heads/##')
       echo "🔄 Found remote branches: ${REMOTE_BRANCHES}"
       for BRANCH in main ${REMOTE_BRANCHES}; do
         echo "🔄 Processing branch ${BRANCH}..."
