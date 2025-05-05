@@ -74,36 +74,13 @@ sync-editorconfig:
     # Get remote branches matching the pattern feature/*,
     # and loop through each branch and copy the files.
     - |
-      function copy_to_branch() {
-        local branch=$1
-        local files=$2
-        echo "🔄 Switch to branch ${branch}…"
-        if git show-ref --verify --quiet "refs/heads/${branch}"; then
-          git checkout "${branch}"
-        else
-          git checkout -b "${branch}" "origin/${branch}"
-        fi
-        echo "📋 Copying files to branch ${branch}..."
-        for file in ${files}; do
-          cp "${file}" .
-          git add "$(basename "$file")"
-        done
-        if git diff --staged --quiet; then
-          echo "ℹ️ No changes to commit for branch ${branch}, skipping..."
-        else
-          echo "✏️ Committing changes to ${branch}..."
-          git commit -m "chore(coding-style): Update coding style files [ci skip]"
-          git push origin "${branch}"
-        fi
-      }
-
       echo "📋 Copying files to target branches..."
       git fetch --prune origin
       REMOTE_BRANCHES=$(git branch -r | grep -E "origin/feature/" | sed 's/origin\///')
       echo "🔄 Found remote branches: ${REMOTE_BRANCHES}"
       for BRANCH in main ${REMOTE_BRANCHES}; do
         echo "🔄 Processing branch ${BRANCH}..."
-        copy_to_branch "$BRANCH" "$FILES_TO_COPY"
+        .gitlab/ci/templates/git/copy_to_branch.sh "$BRANCH" "$FILES_TO_COPY"
       done
       echo "✅ Sync completed successfully"
   after_script:
