@@ -19,7 +19,7 @@ else
 fi
 echo "📋 Copying files to branch ${BRANCH_NAME}..."
 for file in ${FILES}; do
-    DEST="$CI_PROJECT_DIR/$file"
+    DEST="$CI_PROJECT_DIR/$(basename "${file}")"
     cp "${file}" "${DEST}"
     git add "${DEST}"
 done
