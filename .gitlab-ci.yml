@@ -22,6 +22,9 @@ include:
   - project: "line-simulation/unity-npm/ci-scripts"
     ref: "feature/add-ci-templates"
     file: "/.gitlab/ci/templates/changelog/release-changelog.yml"
+  - project: "line-simulation/unity-npm/ci-scripts"
+    ref: "feature/add-ci-templates"
+    file: "/.gitlab/ci/templates/coding-style/sync-coding-style.yml"
 
 workflow:
   rules:
