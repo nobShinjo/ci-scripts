@@ -69,16 +69,17 @@ sync-editorconfig:
           exit 1
         fi
       done
-      echo "Get all branches in the repository..."
-      git fetch --all
-      REMOTE_BRANCHES=$(git ls-remote --heads origin | grep 'refs/heads/feature/' | sed 's#refs/heads/##')
-      echo "🔄 Found remote branches: ${REMOTE_BRANCHES}"
+    - echo "Get all branches in the repository..."
+    - git fetch --all
+    - REMOTE_BRANCHES=$(git ls-remote --heads origin | grep 'refs/heads/feature/' | sed 's#refs/heads/##')
+    - echo "🔄 Found remote branches: ${REMOTE_BRANCHES}"
 
     # Copy files to target branches (main and feature/*)
     # Get remote branches matching the pattern feature/*,
     # and loop through each branch and copy the files.
     - |
       echo "📋 Copying files to target branches..."
+    - |
       for BRANCH in main ${REMOTE_BRANCHES}; do
         echo "🔄 Processing branch ${BRANCH}..."
         bash +x .gitlab/ci/templates/git/copy_to_branch.sh "$BRANCH" "$FILES_TO_COPY"
