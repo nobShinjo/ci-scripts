@@ -8,6 +8,7 @@ include:
 
 variables:
   CODE_STYLE_REPO: "https://${CI_SERVER_HOST}/line-simulation/code-analysis-ruleset.git"
+  GIT_DEPTH: 0
 
 .sync_coding_style_before_script:
   variables: !reference [.git-config, variables]
@@ -72,7 +73,8 @@ sync-editorconfig:
     - echo "Get all branches in the repository..."
     - git fetch --all
     - REMOTE_BRANCHES=$(git ls-remote --heads origin | grep 'refs/heads/feature/' | sed 's#refs/heads/##')
-    - echo "🔄 Found remote branches: ${REMOTE_BRANCHES}"
+    - |
+      echo "🔄 Found remote branches: ${REMOTE_BRANCHES}"
 
     # Copy files to target branches (main and feature/*)
     # Get remote branches matching the pattern feature/*,
