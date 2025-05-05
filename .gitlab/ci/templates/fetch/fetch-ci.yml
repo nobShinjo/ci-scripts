@@ -16,7 +16,7 @@
 .fetch_ci:
   variables:
     CA_STORE_DIR: "/usr/local/share/ca-certificates"
-    CI_REPOSITORY: "https://gitlab.ubuntu.local/linesimulation/unity-npm/ci-scripts.git"
+    CI_REPOSITORY: "https://${CI_SERVER_HOST}/line-simulation/unity-npm/ci-scripts.git"
     CI_BRANCH: "feature/add-ci-templates"
   script:
     # If `ci-scripts` directory exists, fetch the latest changes.
