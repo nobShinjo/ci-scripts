@@ -70,12 +70,18 @@ sync-editorconfig:
           exit 1
         fi
       done
-    - echo "Get all branches in the repository..."
-    - git fetch --all
-    - git ls-remote --heads origin
-    - git ls-remote --heads origin || echo "🚨 git ls-remote failed"
-    - REMOTE_BRANCHES=$(git ls-remote --heads origin | grep 'refs/heads/feature/' | sed 's#refs/heads/##')
+    # Get all branches in the repository
     - |
+      echo "🔍 Looking for remote feature branches..."
+      git fetch --all
+      REMOTE_FEATURE_OUTPUT=$(git ls-remote --heads origin | grep 'refs/heads/feature/' || true)
+
+      if [ -z "$REMOTE_FEATURE_OUTPUT" ]; then
+        echo "ℹ️ No feature/* branches found. Proceeding with main only."
+        REMOTE_BRANCHES="main"
+      else
+        REMOTE_BRANCHES="main $(echo "$REMOTE_FEATURE_OUTPUT" | sed 's#refs/heads/##')"
+      fi
       echo "🔄 Found remote branches: ${REMOTE_BRANCHES}"
 
     # Copy files to target branches (main and feature/*)
@@ -83,9 +89,7 @@ sync-editorconfig:
     # and loop through each branch and copy the files.
     - |
       echo "📋 Copying files to target branches..."
-    - |
       for BRANCH in main ${REMOTE_BRANCHES}; do
-        echo "🔄 Processing branch ${BRANCH}..."
         bash +x .gitlab/ci/templates/git/copy_to_branch.sh "$BRANCH" "$FILES_TO_COPY"
       done
       echo "✅ Sync completed successfully"
