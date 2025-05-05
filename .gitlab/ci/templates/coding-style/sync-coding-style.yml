@@ -80,7 +80,7 @@ sync-editorconfig:
       echo "🔄 Found remote branches: ${REMOTE_BRANCHES}"
       for BRANCH in main ${REMOTE_BRANCHES}; do
         echo "🔄 Processing branch ${BRANCH}..."
-        .gitlab/ci/templates/git/copy_to_branch.sh "$BRANCH" "$FILES_TO_COPY"
+        bash +x .gitlab/ci/templates/git/copy_to_branch.sh "$BRANCH" "$FILES_TO_COPY"
       done
       echo "✅ Sync completed successfully"
   after_script:
