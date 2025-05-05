@@ -32,6 +32,8 @@ fetch_ci_for_sync_coding_style:
   before_script:
     # Install git, configure GitLab CI job token, and update CA certificates.
     - !reference [.git-config, before_script]
+    - echo "Listing files in the current directory..."
+    - ls -al
   only:
     - schedules
 
