@@ -148,13 +148,17 @@ publish_upm_check_version:
   # It also updates the versionBumpHint in package.json to remove it after the version bump.
   # Finally, it saves the next version to a file for use in the publish stage.
   stage: prepare
-  image: "alpine:latest"
+  image: "node:18-alpine"
   extends:
     - .npm_publish_before_script
   needs:
     - publish_upm_prepare
     - fetch_ci_for_npm
   script:
+    # Install necessary tools
+    - |
+      echo "📦 Tool Versions:"
+      npm -v
     # Run the version check and bump script
     - |
       echo "🔍 Checking version..."
