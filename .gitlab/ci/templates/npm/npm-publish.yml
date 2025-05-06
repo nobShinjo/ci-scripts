@@ -309,7 +309,7 @@ publish_upm_publish:
 
       echo "🔑 Authenticating with GitLab npm registry..."
       cd "$DIST_DIR"
-      if ! npm whoami --registry="$NPM_REGISTRY_URL" --userconfig "$NPMRC_PATH"; then
+      if ! npm whoami --userconfig "$NPMRC_PATH"; then
         echo "❌ NPM authentication failed. Check NPM_TOKEN and project permissions."
         exit 1
       fi
