@@ -284,6 +284,7 @@ publish_upm_publish:
         echo "❌ Dry-run failed. Check authentication and registry settings."
         exit 1
       fi
+      cd "$CI_PROJECT_DIR"
     # release the package
     - |
       VERSION=$(cat .next_version)
@@ -315,6 +316,7 @@ publish_upm_publish:
       echo "📦 Publishing to GitLab npm registry..."
       cd "$DIST_DIR"
       npm publish --registry="$NPM_REGISTRY_URL" --userconfig "$NPMRC_PATH"
+      cd "$CI_PROJECT_DIR"
       echo "✅ Published successfully!"
   artifacts:
     name: "publish_upm_publish"
