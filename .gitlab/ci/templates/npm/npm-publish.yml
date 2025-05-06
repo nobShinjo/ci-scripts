@@ -266,6 +266,24 @@ publish_upm_publish:
     - |
       echo "📦 Tool Versions:"
       npm -v
+    # Create .npmrc file for authentication with the GitLab npm registry.
+    - |
+      echo "🔑 Creating .npmrc file..."
+      NPMRC_PATH="$DIST_DIR/.npmrc"
+      trap "rm -f $NPMRC_PATH" EXIT
+      echo "@${CI_PROJECT_ROOT_NAMESPACE}:registry=${NPM_REGISTRY_URL}" > "$NPMRC_PATH"
+      echo "//${CI_SERVER_HOST}/api/v4/projects/${NPM_PROJECT_ID}/packages/npm/:_authToken=${NPM_TOKEN}" >> "$NPMRC_PATH"
+      echo "strict-ssl=false" >> "$NPMRC_PATH"
+      echo "always-auth=true" >> "$NPMRC_PATH"
+      npm config get @${CI_PROJECT_ROOT_NAMESPACE}:registry --userconfig "$NPMRC_PATH"
+    # Authenticating with GitLab npm registry, testing publish with --dry-run
+    - |
+      echo "🧪 Testing publish with --dry-run..."
+      cd "$DIST_DIR"
+      if ! npm publish --dry-run --registry="$NPM_REGISTRY_URL" --userconfig "$NPMRC_PATH" > /dev/null; then
+        echo "❌ Dry-run failed. Check authentication and registry settings."
+        exit 1
+      fi
     # release the package
     - |
       VERSION=$(cat .next_version)
@@ -294,27 +312,8 @@ publish_upm_publish:
       git push -o ci.skip origin "v$VERSION"
     # Create .npmrc file for authentication with the GitLab npm registry
     - |
-      echo "🔑 Creating .npmrc file..."
-      NPMRC_PATH="$DIST_DIR/.npmrc"
-      trap "rm -f $NPMRC_PATH" EXIT
-
-      echo "@${CI_PROJECT_ROOT_NAMESPACE}:registry=${NPM_REGISTRY_URL}" > "$NPMRC_PATH"
-      echo "//${CI_SERVER_HOST}/api/v4/projects/${NPM_PROJECT_ID}/packages/npm/:_authToken=${NPM_TOKEN}" >> "$NPMRC_PATH"
-      echo "strict-ssl=false" >> "$NPMRC_PATH"
-      echo "always-auth=true" >> "$NPMRC_PATH"
-
-      echo "📦 NPM registry URL: $NPM_REGISTRY_URL"
-      echo "NPM config registry: $(npm config get registry --userconfig "$NPMRC_PATH")"
-      npm config get @${CI_PROJECT_ROOT_NAMESPACE}:registry --userconfig "$NPMRC_PATH"
-
-      echo "🔑 Authenticating with GitLab npm registry..."
-      cd "$DIST_DIR"
-      if ! npm whoami --userconfig "$NPMRC_PATH"; then
-        echo "❌ NPM authentication failed. Check NPM_TOKEN and project permissions."
-        exit 1
-      fi
-
       echo "📦 Publishing to GitLab npm registry..."
+      cd "$DIST_DIR"
       npm publish --registry="$NPM_REGISTRY_URL" --userconfig "$NPMRC_PATH"
       echo "✅ Published successfully!"
   artifacts:
