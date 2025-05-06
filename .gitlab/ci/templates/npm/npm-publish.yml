@@ -280,7 +280,11 @@ publish_upm_publish:
     - |
       echo "🧪 Testing publish with --dry-run..."
       cd "$DIST_DIR"
-      if ! npm publish --dry-run --registry="$NPM_REGISTRY_URL" --userconfig "$NPMRC_PATH" > /dev/null; then
+      if ! npm publish --dry-run \
+        --registry="$NPM_REGISTRY_URL" \
+        --userconfig "$NPMRC_PATH" \
+        --loglevel=error \
+        > /dev/null; then
         echo "❌ Dry-run failed. Check authentication and registry settings."
         exit 1
       fi

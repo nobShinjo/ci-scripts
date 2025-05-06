@@ -121,13 +121,13 @@ fi
 # - '%40' is the URL-encoded version of '@'
 # - '%2F' is the URL-encoded version of '/'
 ENCODED_NAME=$(echo "$PACKAGE_NAME" | sed 's/@/%40/' | sed 's/\//%2F/')
-PACKAGE_INFO_URL="${REGISTRY_URL%-*}/npm/${ENCODED_NAME}"
+PACKAGE_INFO_URL="${REGISTRY_URL%-*}${ENCODED_NAME}"
 
 # Get the published version from the GitLab registry.
 echo "🌐 Registry: $PACKAGE_INFO_URL"
-RESPONSE=$(curl -s --header "PRIVATE-TOKEN: ${NPM_TOKEN}" "$PACKAGE_INFO_URL")
-if echo "$RESPONSE" | jq -e '.versions' >/dev/null 2>&1; then
-    PUBLISHED_VERSION=$(echo "$RESPONSE" | jq -r '.versions | keys | last')
+RESPONSE=$(curl -s --header "Authorization: Bearer ${NPM_TOKEN}" "$PACKAGE_INFO_URL")
+if echo "$RESPONSE" | jq -e '.["dist-tags"]' >/dev/null; then
+    PUBLISHED_VERSION=$(echo "$RESPONSE" | jq -r '.["dist-tags"].latest')
 else
     echo "⚠️ Version information not found in the response: $RESPONSE"
     PUBLISHED_VERSION=""
