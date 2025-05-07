@@ -172,7 +172,7 @@ publish_upm_check_version:
     # Run the version check and bump script
     - |
       echo "🔍 Checking version..."
-      bash +x .gitlab/ci/scripts/npm/manage_package_version.sh "$DIST_DIR/package.json" "$DIST_DIR" "$NPM_REGISTRY_URL" "$NPM_TOKEN"
+      bash +x .gitlab/ci/scripts/npm/manage_package_version.sh "$DIST_DIR/package.json" "$DIST_DIR" "$NPM_REGISTRY_URL" "$NPMRC_PATH"
       echo "✅ Version check and bump completed."
   artifacts:
     name: "publish_upm_check_version"

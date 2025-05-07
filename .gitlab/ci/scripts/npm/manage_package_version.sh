@@ -19,7 +19,7 @@ set -euxo pipefail
 PACKAGE_JSON=$1
 DIST_DIR=$2
 REGISTRY_URL=$3
-NPM_TOKEN=$4
+NPMRC_PATH=$4
 NEXT_VERSION_FILE=".next_version"
 
 # =========================
