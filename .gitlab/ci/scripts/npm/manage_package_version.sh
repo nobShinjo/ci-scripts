@@ -118,7 +118,7 @@ fi
 
 # Get the published version from the Verdaccio npm registry.
 echo "🏷️ Getting published version from $REGISTRY_URL..."
-PUBLISHED_VERSION=$(npm view "$PACKAGE_NAME" version --registry="$REGISTRY_URL" 2>/dev/null || true)
+PUBLISHED_VERSION=$(npm view "$PACKAGE_NAME" version --registry="$REGISTRY_URL" --userconfig "$NPMRC_PATH" 2>/dev/null || true)
 
 # Adopt the version based on the published version and the local version.
 if [[ -z "$PUBLISHED_VERSION" ]]; then
