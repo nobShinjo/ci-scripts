@@ -168,6 +168,10 @@ publish_upm_check_version:
       echo "//${NPM_REGISTRY_URL#http://}:_authToken=${NPM_TOKEN}" >> "$NPMRC_PATH"
       echo "always-auth=true" >> "$NPMRC_PATH"
       echo "strict-ssl=false" >> "$NPMRC_PATH"
+    # nslookup to check if the registry is reachable
+    # Install nslookup if not already installed
+    - apk add --no-cache bind-tools
+    - nslookup "${NPM_REGISTRY_URL#http://}" || { echo "❌ nslookup failed. Check your network connection."; exit 1; }
     # Run the version check and bump script
     - |
       echo "🔍 Checking version..."
