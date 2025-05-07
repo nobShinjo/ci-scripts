@@ -163,10 +163,15 @@ publish_upm_check_version:
     - |
       echo "🔑 Creating .npmrc file..."
       NPMRC_PATH="$DIST_DIR/.npmrc"
-      echo "registry=${NPM_REGISTRY_URL}" > "$NPMRC_PATH"
-      echo "//${NPM_REGISTRY_URL#http://}:_authToken=${NPM_TOKEN}" >> "$NPMRC_PATH"
-      echo "always-auth=true" >> "$NPMRC_PATH"
-      echo "strict-ssl=false" >> "$NPMRC_PATH"
+      REG_HOST="${NPM_REGISTRY_URL#*://}"
+      REG_HOST="${REG_HOST%%/}"
+      cat <<EOF > "$NPMRC_PATH"
+      registry=$NPM_REGISTRY_URL
+      //$REG_HOST/:_authToken=$NPM_TOKEN
+      always-auth=true
+      strict-ssl=false
+      EOF
+      cat "$NPMRC_PATH"
     # Debug: npm whoami
     - npm whoami --registry="$NPM_REGISTRY_URL" --userconfig "$NPMRC_PATH"
     # Run the version check and bump script
@@ -289,10 +294,15 @@ publish_upm_publish:
     - |
       echo "🔑 Creating .npmrc file..."
       NPMRC_PATH="$DIST_DIR/.npmrc"
-      echo "registry=${NPM_REGISTRY_URL}" > "$NPMRC_PATH"
-      echo "//${NPM_REGISTRY_URL#http://}:_authToken=${NPM_TOKEN}" >> "$NPMRC_PATH"
-      echo "always-auth=true" >> "$NPMRC_PATH"
-      echo "strict-ssl=false" >> "$NPMRC_PATH"
+      REG_HOST="${NPM_REGISTRY_URL#*://}"
+      REG_HOST="${REG_HOST%%/}"
+      cat <<EOF > "$NPMRC_PATH"
+      registry=$NPM_REGISTRY_URL
+      //$REG_HOST/:_authToken=$NPM_TOKEN
+      always-auth=true
+      strict-ssl=false
+      EOF
+      cat "$NPMRC_PATH"
     # Authenticating with Verdaccio npm registry
     - |
       echo "🔑 Authenticating with Verdaccio npm registry..."
