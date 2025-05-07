@@ -163,7 +163,6 @@ publish_upm_check_version:
     - |
       echo "🔑 Creating .npmrc file..."
       NPMRC_PATH="$DIST_DIR/.npmrc"
-      trap "rm -f $NPMRC_PATH" EXIT
       echo "registry=${NPM_REGISTRY_URL}" > "$NPMRC_PATH"
       echo "//${NPM_REGISTRY_URL#http://}:_authToken=${NPM_TOKEN}" >> "$NPMRC_PATH"
       echo "always-auth=true" >> "$NPMRC_PATH"
@@ -175,6 +174,11 @@ publish_upm_check_version:
       echo "🔍 Checking version..."
       bash +x .gitlab/ci/scripts/npm/manage_package_version.sh "$DIST_DIR/package.json" "$DIST_DIR" "$NPM_REGISTRY_URL" "$NPMRC_PATH"
       echo "✅ Version check and bump completed."
+  after_script:
+    # Clean up the .npmrc file after the job is done
+    - |
+      echo "🧹 Cleaning up..."
+      rm -f "$DIST_DIR/.npmrc"
   artifacts:
     name: "publish_upm_check_version"
     paths:
@@ -285,7 +289,6 @@ publish_upm_publish:
     - |
       echo "🔑 Creating .npmrc file..."
       NPMRC_PATH="$DIST_DIR/.npmrc"
-      trap "rm -f $NPMRC_PATH" EXIT
       echo "registry=${NPM_REGISTRY_URL}" > "$NPMRC_PATH"
       echo "//${NPM_REGISTRY_URL#http://}:_authToken=${NPM_TOKEN}" >> "$NPMRC_PATH"
       echo "always-auth=true" >> "$NPMRC_PATH"
@@ -344,6 +347,11 @@ publish_upm_publish:
       npm publish --registry="$NPM_REGISTRY_URL" --userconfig "$NPMRC_PATH"
       cd "$CI_PROJECT_DIR"
       echo "✅ Published successfully!"
+  after_script:
+    # Clean up the .npmrc file after the job is done
+    - |
+      echo "🧹 Cleaning up..."
+      rm -f "$DIST_DIR/.npmrc"
   artifacts:
     name: "publish_upm_publish"
     paths:
