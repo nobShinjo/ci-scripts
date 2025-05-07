@@ -32,8 +32,8 @@ variables:
   PACKAGE_JSON_PATH: "Assets/${PACKAGE_NAME}/package.json"
   CHANGELOG_FILE: "CHANGELOG.md"
   DIST_DIR: "dist"
-  NPM_PROJECT_ID: "${CI_NPM_PROJECT_ID}"
-  NPM_REGISTRY_URL: "https://${CI_SERVER_HOST}/api/v4/projects/${NPM_PROJECT_ID}/packages/npm/"
+  # Verdaccio registry URL must be set via CI variable
+  NPM_REGISTRY_URL: "${VERDACCIO_REGISTRY_URL}"
 
 .npm_publish_before_script:
   variables: !reference [.git-config, variables]
@@ -270,17 +270,24 @@ publish_upm_publish:
     - |
       echo "📦 Tool Versions:"
       npm -v
-    # Create .npmrc file for authentication with the GitLab npm registry.
+    # Create .npmrc file for authentication with the registry
     - |
       echo "🔑 Creating .npmrc file..."
       NPMRC_PATH="$DIST_DIR/.npmrc"
       trap "rm -f $NPMRC_PATH" EXIT
-      echo "@${CI_PROJECT_ROOT_NAMESPACE}:registry=${NPM_REGISTRY_URL}" > "$NPMRC_PATH"
-      echo "//${CI_SERVER_HOST}/api/v4/projects/${NPM_PROJECT_ID}/packages/npm/:_authToken=${NPM_TOKEN}" >> "$NPMRC_PATH"
-      echo "strict-ssl=false" >> "$NPMRC_PATH"
+      echo "registry=${NPM_REGISTRY_URL}" > "$NPMRC_PATH"
+      echo "//${NPM_REGISTRY_URL#http://}:_authToken=${NPM_TOKEN}" >> "$NPMRC_PATH"
       echo "always-auth=true" >> "$NPMRC_PATH"
-      npm config get @${CI_PROJECT_ROOT_NAMESPACE}:registry --userconfig "$NPMRC_PATH"
-    # Authenticating with GitLab npm registry, testing publish with --dry-run
+      echo "strict-ssl=false" >> "$NPMRC_PATH"
+    # Authenticating with Verdaccio npm registry
+    - |
+      echo "🔑 Authenticating with Verdaccio npm registry..."
+      if ! npm whoami --registry="$NPM_REGISTRY_URL" --userconfig "$NPMRC_PATH" > /dev/null 2>&1; then
+        echo "❌ Authentication failed. Check your NPM_TOKEN and registry URL."
+        exit 1
+      fi
+      echo "✅ Authentication successful."
+    # Check if the package is already published
     - |
       echo "🧪 Testing publish with --dry-run..."
       cd "$DIST_DIR"
