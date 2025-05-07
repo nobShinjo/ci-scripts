@@ -1,137 +1,68 @@
-# ci-scripts
+# 🚀 CI-Scripts: GitLab CI
 
-## 概要
+## 📖 概要 Summary
 
-GitLab CI/CD 用の再利用可能なテンプレート＆スクリプト集。  
-チームやプロジェクト共通のCI設定を簡単に導入できるよう、以下の機能を提供。
+ `.gitlab-ci-sample.yml` を `.gitlab-ci.yml` として登録することで、常に GitLab CI の最新スクリプト、最新テンプレートを簡単にインポートできるようにするためのリポジトリです。
 
-- **CHANGELOG 自動生成**（git-cliff 連携）
-- **Unity UPM パッケージ自動公開**（npm Registry 連携）
-- **プロジェクトリリース自動化**（VERSION.yml をベース）
+## ✨ 機能 Features
 
----
+* 🚀 最新の GitLab CI 設定をワンクリックでインポート
+* 📂 ステージごとに分割されたテンプレート（fetch／bump／release／changelog）
+* 🔄 テンプレートの再利用性・可読性を向上
+* 🛠 必要に応じてカスタマイズ可能なサンプル CI 定義
 
-## ディレクトリ構成
+## 🛠 使用方法 Usage
 
-```plain
-<project-root>/
-├─ .gitlab/
-│   └─ ci/
-│       ├─ config/          ※ CI 設定ファイル (.cliff.toml 等)
-│       ├─ templates/       ※ GitLab CI テンプレート
-│       │    ├─ changelog/
-│       │    ├─ npm/
-│       │    └─ release/
-│       └─ scripts/         ※ 補助スクリプト
-│            ├─ changelog/
-│            ├─ npm/
-│            └─ release/
-├─ .gitlab-ci.yml           ※ メイン CI 定義
-└─ その他 (VERSION.yml, CHANGELOG.md など)
+1. 📥 レポジトリをクローン
+
+   ```bash
+   git clone -b feature/add-ci-templates https://github.com/nobShinjo/ci-scripts.git
+   ```
+
+2. 🔄 プロジェクトのルートに移動し、
+   `.gitlab-ci-sample.yml` を `.gitlab-ci.yml` にコピー
+
+   ```bash
+   cp .gitlab-ci-sample.yml your-project/.gitlab-ci.yml
+   ```
+
+3. ⚙️ GitLab の **CI/CD > Variables** に必要な環境変数／トークンを登録
+4. ✅ コミット＆プッシュして、CI パイプラインが正常に動作することを確認
+
+## 📁 ディレクトリ構成 Directories
+
+```plane
+.
+├── .gitlab-ci-sample.yml       # サンプル CI 定義
+├── .gitlab
+│   └── ci
+│       └── templates
+│           ├── fetch          # 初期フェッチ用テンプレート
+│           ├── bump           # バージョンバンプ用テンプレート
+│           ├── release        # リリース用テンプレート
+│           └── changelog      # Changelog 生成テンプレート
+└── README.md                   # この README
 ```
 
----
+## 🔧 必要要件 Required
 
-## テンプレート一覧
+* GitLab CI/CD が有効なプロジェクト
+* Node.js（≥14）＆ npm
+* Docker Engine
+* Verdaccio（社内 npm レジストリ）
+* GitLab Runner ※任意
 
-### CHANGELOG 自動生成
+### 🔑 GitLab CI変数
 
-- `changelog/common.yml`  
-- `changelog/draft.yml`  
-- `changelog/release.yml`  
-→ 詳細は各フォルダ内の `README.md` を参照。
+* 🌐 `NPM_REGISTRY_URL` : Verdaccio レジストリの URL
+* 🔀 `CI_DEFAULT_BRANCH`: デフォルトブランチ名（例: `main`）
 
-### Unity UPM 自動公開
+### 🛡 GitLab Access Token
 
-- `npm/npm-publish.yml`  
-→ `README_npm-publish.md` を確認。
+* `GITLAB_ACCESS_TOKEN` : GitLab API（read\_api）にアクセスするためのパーソナルアクセストークン
 
-### プロジェクトリリース自動化
+### 🔑 Verdaccio Access Token
 
-- `release/project-release.yml`  
-→ `README_project-release.md` を確認。
-
----
-
-## スクリプト
-
-- `scripts/changelog/update_for_release.sh`
-- `scripts/npm/manage_package_version.sh`
-- `scripts/release/generate_release_note.sh`
-- `scripts/release/manage_version.sh`
+* `NPM_TOKEN` : Verdaccio レジストリへの publish 認証トークン
 
 ---
-
-## 導入手順
-
-1. プロジェクトのルートに `.gitlab-ci.yml` を作成し、必要なテンプレートを `include` する。
-2. GitLab の **Settings > CI/CD > Variables** にて、以下の変数を登録：  
-   - `CLIFF_CONFIG_PATH`, `CHANGELOG_FILE`, etc.  
-   - `NPM_TOKEN`, `GITLAB_TOKEN`, `CI_JOB_TOKEN` 等
-3. ブランチ戦略やジョブトリガーをプロジェクト要件に合わせて調整。
-4. CI 実行 → 自動生成／自動公開／自動リリースを確認。
-
----
-
-## 前提要件
-
-- GitLab Runner (Shell または Docker Executor)
-- Bash, `yq`, `jq`, `git`, `git-cliff`, `npm`, `curl` などのツール
-- （オプション）`release-cli` for GitLab Release
-
----
-
-## .gitlab-ci.yml サンプル
-
-```yaml
-stages:
-  - fetch
-  - changelog
-  - build
-  - test
-  - release
-
-variables:
-  CLIFF_CONFIG_PATH: "${CI_PROJECT_DIR}/.gitlab/ci/config/.cliff.toml"
-  CHANGELOG_FILE: "CHANGELOG.md"
-
-include:
-  - project: "line-simulation/unity-npm/ci-scripts"
-    ref: "feature/add-ci-templates"
-    file: "/.gitlab/ci/templates/fetch/fetch-ci.yml"
-  - project: line-simulation/unity-npm/ci-scripts
-    ref: feature/add-ci-templates
-    file: /.gitlab/ci/templates/changelog/common.yml
-  - project: line-simulation/unity-npm/ci-scripts
-    ref: feature/add-ci-templates
-    file: /.gitlab/ci/templates/npm/npm-publish.yml
-  - project: line-simulation/unity-npm/ci-scripts
-    ref: feature/add-ci-templates
-    file: /.gitlab/ci/templates/release/project-release.yml
-
-changelog:
-  stage: changelog
-  script:
-    - scripts/changelog/update_for_release.sh
-  only:
-    refs:
-      - main
-
-build:
-  stage: build
-  script:
-    - echo "Build step placeholder"
-
-test:
-  stage: test
-  script:
-    - echo "Test step placeholder"
-
-release:
-  stage: release
-  script:
-    - scripts/release/manage_version.sh
-  only:
-    refs:
-      - tags
-```
