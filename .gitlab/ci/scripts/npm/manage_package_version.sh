@@ -116,22 +116,9 @@ if ! validate_version "$CURRENT_VERSION"; then
     exit 1
 fi
 
-# Encode the package name for the GitLab registry URL.
-# GitLab requires @scope/package-name as %40scope%2Fpackage-name
-# - '%40' is the URL-encoded version of '@'
-# - '%2F' is the URL-encoded version of '/'
-ENCODED_NAME=$(echo "$PACKAGE_NAME" | sed 's/@/%40/' | sed 's/\//%2F/')
-PACKAGE_INFO_URL="${REGISTRY_URL%-*}${ENCODED_NAME}"
-
-# Get the published version from the GitLab registry.
-echo "🌐 Registry: $PACKAGE_INFO_URL"
-RESPONSE=$(curl -s --header "Authorization: Bearer ${NPM_TOKEN}" "$PACKAGE_INFO_URL")
-if echo "$RESPONSE" | jq -e '.["dist-tags"]' >/dev/null; then
-    PUBLISHED_VERSION=$(echo "$RESPONSE" | jq -r '.["dist-tags"].latest')
-else
-    echo "⚠️ Version information not found in the response: $RESPONSE"
-    PUBLISHED_VERSION=""
-fi
+# Get the published version from the Verdaccio npm registry.
+echo "🏷️ Getting published version from $REGISTRY_URL..."
+PUBLISHED_VERSION=$(npm view "$PACKAGE_NAME" version --registry="$REGISTRY_URL" 2>/dev/null || true)
 
 # Adopt the version based on the published version and the local version.
 if [[ -z "$PUBLISHED_VERSION" ]]; then

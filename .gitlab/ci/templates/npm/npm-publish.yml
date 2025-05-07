@@ -159,6 +159,15 @@ publish_upm_check_version:
     - |
       echo "📦 Tool Versions:"
       npm -v
+    # Create .npmrc file for authentication with the registry
+    - |
+      echo "🔑 Creating .npmrc file..."
+      NPMRC_PATH="$DIST_DIR/.npmrc"
+      trap "rm -f $NPMRC_PATH" EXIT
+      echo "registry=${NPM_REGISTRY_URL}" > "$NPMRC_PATH"
+      echo "//${NPM_REGISTRY_URL#http://}:_authToken=${NPM_TOKEN}" >> "$NPMRC_PATH"
+      echo "always-auth=true" >> "$NPMRC_PATH"
+      echo "strict-ssl=false" >> "$NPMRC_PATH"
     # Run the version check and bump script
     - |
       echo "🔍 Checking version..."
